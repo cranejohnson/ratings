@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RatingCurves xmlns="http://www.wldelft.nl/fews/PI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.wldelft.nl/fews/PI http://chps1/schemas/pi-schemas/pi_ratingcurves.xsd" version="1.2">
+  <timeZone>0.0</timeZone>
+  <ratingCurve>
+    <header>
+      <locationId>BGDA2</locationId>
+      <startDate date="2012-11-04" time="01:00:00"/>
+      <stageUnit>FT</stageUnit>
+      <dischargeUnit>CFS</dischargeUnit>
+      <sourceOrganisation>Manual</sourceOrganisation>
+      <comment>Maximum Qmeas:  43400;  Max QMeas Stage (ft): ---- </comment>
+    </header>
+    <table>
+      <interpolationMethod>logarithmic</interpolationMethod>
+      <minStage>1.9</minStage>
+      <maxStage>INF</maxStage>
+      <row discharge="1.9" stage="4.2" />
+      <row discharge="14.5" stage="4.48" />
+      <row discharge="41.9" stage="4.76" />
+      <row discharge="86.5" stage="5.04" />
+      <row discharge="150.2" stage="5.32" />
+      <row discharge="234.4" stage="5.6" />
+      <row discharge="340.4" stage="5.88" />
+      <row discharge="469.4" stage="6.16" />
+      <row discharge="622.3" stage="6.44" />
+      <row discharge="800.1" stage="6.72" />
+      <row discharge="1003.6" stage="7" />
+      <row discharge="1233.8" stage="7.28" />
+      <row discharge="1491.2" stage="7.56" />
+      <row discharge="1776.7" stage="7.84" />
+      <row discharge="2090.9" stage="8.12" />
+      <row discharge="2434.4" stage="8.4" />
+      <row discharge="2807.9" stage="8.68" />
+      <row discharge="3211.9" stage="8.96" />
+      <row discharge="3647.1" stage="9.24" />
+      <row discharge="4113.8" stage="9.52" />
+      <row discharge="4612.8" stage="9.8" />
+      <row discharge="5144.4" stage="10.08" />
+      <row discharge="5709.2" stage="10.36" />
+      <row discharge="6307.6" stage="10.64" />
+      <row discharge="6940.1" stage="10.92" />
+      <row discharge="7607.1" stage="11.2" />
+      <row discharge="8309.1" stage="11.48" />
+      <row discharge="9046.5" stage="11.76" />
+      <row discharge="9819.6" stage="12.04" />
+      <row discharge="10629" stage="12.32" />
+      <row discharge="11474.9" stage="12.6" />
+      <row discharge="12357.8" stage="12.88" />
+      <row discharge="13278" stage="13.16" />
+      <row discharge="14236" stage="13.44" />
+      <row discharge="15232" stage="13.72" />
+      <row discharge="16266.4" stage="14" />
+      <row discharge="17339.6" stage="14.28" />
+      <row discharge="18451.8" stage="14.56" />
+      <row discharge="19603.5" stage="14.84" />
+      <row discharge="20795" stage="15.12" />
+      <row discharge="22026.5" stage="15.4" />
+      <row discharge="23298.4" stage="15.68" />
+      <row discharge="24611" stage="15.96" />
+      <row discharge="25964.5" stage="16.24" />
+      <row discharge="27359.4" stage="16.52" />
+      <row discharge="28795.9" stage="16.8" />
+      <row discharge="30274.2" stage="17.08" />
+      <row discharge="31794.7" stage="17.36" />
+      <row discharge="33357.6" stage="17.64" />
+      <row discharge="34963.3" stage="17.92" />
+      <row discharge="36611.9" stage="18.2" />
+      <row discharge="38303.8" stage="18.48" />
+      <row discharge="40039.2" stage="18.76" />
+      <row discharge="41818.5" stage="19.04" />
+      <row discharge="43641.7" stage="19.32" />
+      <row discharge="45509.3" stage="19.6" />
+      <row discharge="47421.4" stage="19.88" />
+      <row discharge="49378.3" stage="20.16" />
+      <row discharge="51380.3" stage="20.44" />
+      <row discharge="53427.6" stage="20.72" />
+      <row discharge="55520.4" stage="21" />
+      <row discharge="57659" stage="21.28" />
+      <row discharge="59843.6" stage="21.56" />
+      <row discharge="62074.4" stage="21.84" />
+      <row discharge="64351.7" stage="22.12" />
+      <row discharge="66675.7" stage="22.4" />
+      <row discharge="69046.7" stage="22.68" />
+      <row discharge="71464.7" stage="22.96" />
+      <row discharge="73930.2" stage="23.24" />
+      <row discharge="76443.2" stage="23.52" />
+      <row discharge="79004" stage="23.8" />
+      <row discharge="81612.8" stage="24.08" />
+      <row discharge="84269.9" stage="24.36" />
+      <row discharge="86975.4" stage="24.64" />
+      <row discharge="89729.5" stage="24.92" />
+      <row discharge="92532.5" stage="25.2" />
+      <row discharge="95384.6" stage="25.48" />
+      <row discharge="98285.9" stage="25.76" />
+      <row discharge="101236.6" stage="26.04" />
+      <row discharge="104237.1" stage="26.32" />
+      <row discharge="107287.3" stage="26.6" />
+      <row discharge="110387.6" stage="26.88" />
+      <row discharge="113538.2" stage="27.16" />
+      <row discharge="116739.2" stage="27.44" />
+      <row discharge="119990.8" stage="27.72" />
+      <row discharge="123293.2" stage="28" />
+    </table>
+  </ratingCurve>
+</RatingCurves>

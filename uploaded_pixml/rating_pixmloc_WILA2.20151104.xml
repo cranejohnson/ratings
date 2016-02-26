@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RatingCurves xmlns="http://www.wldelft.nl/fews/PI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.wldelft.nl/fews/PI http://chps1/schemas/pi-schemas/pi_ratingcurves.xsd" version="1.2">
+  <timeZone>0.0</timeZone>
+  <ratingCurve>
+    <header>
+      <locationId>WILA2</locationId>
+      <startDate date="2015-11-04" time="01:00:00"/>
+      <stageUnit>FT</stageUnit>
+      <dischargeUnit>CFS</dischargeUnit>
+      <sourceOrganisation>Manual</sourceOrganisation>
+      <comment>Maximum Qmeas:  5970;  Max QMeas Stage (ft): ---- </comment>
+    </header>
+    <table>
+      <interpolationMethod>logarithmic</interpolationMethod>
+      <minStage>0</minStage>
+      <maxStage>9999</maxStage>
+      <row discharge="3.1" stage="0" logScaleStageOffset="-6.4"/>
+      <row discharge="3.6" stage="0.14" logScaleStageOffset="-6.4"/>
+      <row discharge="4.2" stage="0.28" logScaleStageOffset="-6.4"/>
+      <row discharge="4.9" stage="0.42" logScaleStageOffset="-6.4"/>
+      <row discharge="5.7" stage="0.56" logScaleStageOffset="-6.4"/>
+      <row discharge="6.6" stage="0.7" logScaleStageOffset="-6.4"/>
+      <row discharge="7.6" stage="0.84" logScaleStageOffset="-6.4"/>
+      <row discharge="8.7" stage="0.98" logScaleStageOffset="-6.4"/>
+      <row discharge="10" stage="1.12" logScaleStageOffset="-6.4"/>
+      <row discharge="11.5" stage="1.26" logScaleStageOffset="-6.4"/>
+      <row discharge="13.1" stage="1.4" logScaleStageOffset="-6.4"/>
+      <row discharge="15" stage="1.54" logScaleStageOffset="-6.4"/>
+      <row discharge="17" stage="1.68" logScaleStageOffset="-6.4"/>
+      <row discharge="19.3" stage="1.83" logScaleStageOffset="-6.4"/>
+      <row discharge="21.9" stage="1.97" logScaleStageOffset="-6.4"/>
+      <row discharge="24.7" stage="2.11" logScaleStageOffset="-6.4"/>
+      <row discharge="27.9" stage="2.25" logScaleStageOffset="-6.4"/>
+      <row discharge="31.4" stage="2.39" logScaleStageOffset="-6.4"/>
+      <row discharge="35.3" stage="2.53" logScaleStageOffset="-6.4"/>
+      <row discharge="39.5" stage="2.67" logScaleStageOffset="-6.4"/>
+      <row discharge="44.3" stage="2.81" logScaleStageOffset="-6.4"/>
+      <row discharge="49.5" stage="2.95" logScaleStageOffset="-6.4"/>
+      <row discharge="55.2" stage="3.09" logScaleStageOffset="-6.4"/>
+      <row discharge="61.4" stage="3.23" logScaleStageOffset="-6.4"/>
+      <row discharge="68.3" stage="3.37" logScaleStageOffset="-6.4"/>
+      <row discharge="75.9" stage="3.51" logScaleStageOffset="-6.4"/>
+      <row discharge="84.1" stage="3.65" logScaleStageOffset="-6.4"/>
+      <row discharge="93.2" stage="3.79" logScaleStageOffset="-6.4"/>
+      <row discharge="103" stage="3.93" logScaleStageOffset="-6.4"/>
+      <row discharge="113.7" stage="4.07" logScaleStageOffset="-6.4"/>
+      <row discharge="125.4" stage="4.21" logScaleStageOffset="-6.4"/>
+      <row discharge="138.1" stage="4.35" logScaleStageOffset="-6.4"/>
+      <row discharge="151.9" stage="4.49" logScaleStageOffset="-6.4"/>
+      <row discharge="166.9" stage="4.63" logScaleStageOffset="-6.4"/>
+      <row discharge="183.1" stage="4.77" logScaleStageOffset="-6.4"/>
+      <row discharge="200.7" stage="4.91" logScaleStageOffset="-6.4"/>
+      <row discharge="219.7" stage="5.05" logScaleStageOffset="-6.4"/>
+      <row discharge="240.3" stage="5.19" logScaleStageOffset="-6.4"/>
+      <row discharge="262.4" stage="5.34" logScaleStageOffset="-6.4"/>
+      <row discharge="286.4" stage="5.48" logScaleStageOffset="-6.4"/>
+      <row discharge="312.2" stage="5.62" logScaleStageOffset="-6.4"/>
+      <row discharge="340" stage="5.76" logScaleStageOffset="-6.4"/>
+      <row discharge="369.9" stage="5.9" logScaleStageOffset="-6.4"/>
+      <row discharge="402" stage="6.04" logScaleStageOffset="-6.4"/>
+      <row discharge="436.6" stage="6.18" logScaleStageOffset="-6.4"/>
+      <row discharge="473.6" stage="6.32" logScaleStageOffset="-6.4"/>
+      <row discharge="513.4" stage="6.46" logScaleStageOffset="-6.4"/>
+      <row discharge="556" stage="6.6" logScaleStageOffset="-6.4"/>
+      <row discharge="601.6" stage="6.74" logScaleStageOffset="-6.4"/>
+      <row discharge="650.4" stage="6.88" logScaleStageOffset="-6.4"/>
+      <row discharge="702.6" stage="7.02" logScaleStageOffset="-6.4"/>
+      <row discharge="758.4" stage="7.16" logScaleStageOffset="-6.4"/>
+      <row discharge="817.9" stage="7.3" logScaleStageOffset="-6.4"/>
+      <row discharge="881.5" stage="7.44" logScaleStageOffset="-6.4"/>
+      <row discharge="949.3" stage="7.58" logScaleStageOffset="-6.4"/>
+      <row discharge="1021.5" stage="7.72" logScaleStageOffset="-6.4"/>
+      <row discharge="1098.4" stage="7.86" logScaleStageOffset="-6.4"/>
+      <row discharge="1180.3" stage="8" logScaleStageOffset="-6.4"/>
+      <row discharge="1267.4" stage="8.14" logScaleStageOffset="-6.4"/>
+      <row discharge="1360.1" stage="8.28" logScaleStageOffset="-6.4"/>
+      <row discharge="1458.5" stage="8.42" logScaleStageOffset="-6.4"/>
+      <row discharge="1562.9" stage="8.56" logScaleStageOffset="-6.4"/>
+      <row discharge="1673.8" stage="8.7" logScaleStageOffset="-6.4"/>
+      <row discharge="1791.5" stage="8.85" logScaleStageOffset="-6.4"/>
+      <row discharge="1916.2" stage="8.99" logScaleStageOffset="-6.4"/>
+      <row discharge="2048.3" stage="9.13" logScaleStageOffset="-6.4"/>
+      <row discharge="2188.2" stage="9.27" logScaleStageOffset="-6.4"/>
+      <row discharge="2336.3" stage="9.41" logScaleStageOffset="-6.4"/>
+      <row discharge="2493" stage="9.55" logScaleStageOffset="-6.4"/>
+      <row discharge="2658.6" stage="9.69" logScaleStageOffset="-6.4"/>
+      <row discharge="2833.7" stage="9.83" logScaleStageOffset="-6.4"/>
+      <row discharge="3018.7" stage="9.97" logScaleStageOffset="-6.4"/>
+      <row discharge="3214" stage="10.11" logScaleStageOffset="-6.4"/>
+      <row discharge="3420.2" stage="10.25" logScaleStageOffset="-6.4"/>
+      <row discharge="3637.6" stage="10.39" logScaleStageOffset="-6.4"/>
+      <row discharge="3866.9" stage="10.53" logScaleStageOffset="-6.4"/>
+      <row discharge="4108.6" stage="10.67" logScaleStageOffset="-6.4"/>
+      <row discharge="4363.2" stage="10.81" logScaleStageOffset="-6.4"/>
+      <row discharge="4631.3" stage="10.95" logScaleStageOffset="-6.4"/>
+      <row discharge="4913.5" stage="11.09" logScaleStageOffset="-6.4"/>
+      <row discharge="5210.5" stage="11.23" logScaleStageOffset="-6.4"/>
+      <row discharge="5522.8" stage="11.37" logScaleStageOffset="-6.4"/>
+      <row discharge="5851.2" stage="11.51" logScaleStageOffset="-6.4"/>
+      <row discharge="6196.3" stage="11.65" logScaleStageOffset="-6.4"/>
+      <row discharge="6558.9" stage="11.79" logScaleStageOffset="-6.4"/>
+      <row discharge="6939.6" stage="11.93" logScaleStageOffset="-6.4"/>
+      <row discharge="7339.3" stage="12.07" logScaleStageOffset="-6.4"/>
+      <row discharge="7758.7" stage="12.21" logScaleStageOffset="-6.4"/>
+      <row discharge="8198.7" stage="12.36" logScaleStageOffset="-6.4"/>
+      <row discharge="8660" stage="12.5" logScaleStageOffset="-6.4"/>
+      <row discharge="9143.6" stage="12.64" logScaleStageOffset="-6.4"/>
+      <row discharge="9650.4" stage="12.78" logScaleStageOffset="-6.4"/>
+      <row discharge="10181.2" stage="12.92" logScaleStageOffset="-6.4"/>
+      <row discharge="10737" stage="13.06" logScaleStageOffset="-6.4"/>
+      <row discharge="11318.9" stage="13.2" logScaleStageOffset="-6.4"/>
+      <row discharge="11927.8" stage="13.34" logScaleStageOffset="-6.4"/>
+      <row discharge="12564.8" stage="13.48" logScaleStageOffset="-6.4"/>
+      <row discharge="13231" stage="13.62" logScaleStageOffset="-6.4"/>
+      <row discharge="13927.5" stage="13.76" logScaleStageOffset="-6.4"/>
+      <row discharge="14655.4" stage="13.9" logScaleStageOffset="-6.4"/>
+      <row discharge="15415.9" stage="14.04" logScaleStageOffset="-6.4"/>
+    </table>
+  </ratingCurve>
+</RatingCurves>
