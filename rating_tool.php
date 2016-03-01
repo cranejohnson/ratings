@@ -21,7 +21,7 @@ date_default_timezone_set('UTC');
 
 
 /* Include config file for paths etc.....   */
-require_once('/usr/local/apps/scripts/bcj/bcj_config.php');
+require_once('/usr/local/apps/scripts/bcj/hydroTools/config.inc.php');
 require_once "/hd1apps/data/intranet/html/tools/PHPMailer/PHPMailerAutoload.php";
 
 /* Include Pear log package                 */
