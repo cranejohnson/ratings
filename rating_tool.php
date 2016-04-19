@@ -539,14 +539,28 @@ if($action == 'importPiXML'){
 		if(move_uploaded_file($tmpFilePath, $newFilePath)) {
 
 			$logger->log("Moved file:".$_FILES['upload']['name'][$i]." to archive directory",PEAR_LOG_INFO);
+            $path_parts = pathinfo($newFilePath);
+            
 			$site = new riverSite($logger,$mysqli);
-		   
-			if(!$site->import_piXML(file_GET_contents($newFilePath))){
-				$logger->log("Failed to read piXML: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
-				//continue to next file!!!!!!!!
-				continue;
-			}    
-			
+		    if($path_parts['extension'] == 'xml'){
+                if(!$site->import_piXML(file_GET_contents($newFilePath))){
+                    $logger->log("Failed to read piXML: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
+                    //continue to next file!!!!!!!!
+                    continue;
+                }    
+            }
+            elseif($path_parts['extension'] == 'rdb'){
+                if(!$site->loadRDB(file_GET_contents($newFilePath))){
+                    $logger->log("Failed to read RDB: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
+                    //continue to next file!!!!!!!!
+                    continue;
+                }
+             }   
+            else{
+                $logger->log("Unknown File type: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
+            }
+            
+            
 			if($site->dbInsertRating()){
 				array_push($sites,$site->lid);
 			} 
