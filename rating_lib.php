@@ -5,7 +5,7 @@
  *
  * @package Riversite
  */
- 
+
 class RiverSite{
 
     public $usgs = '';
@@ -34,34 +34,34 @@ class RiverSite{
 	 * @return boolean Returns true if the site was found in the db table
 	 */
 
-    private function getConfigInfo($site){
+    private function getConfigInfo($siteID{
         //If the site id > 8 this must be a usgs identifier
-        if(strlen($site) >= 8){
-            $query = "Select lid,toCHPS from ratings_config where usgs = $site";
+        if(strlen($siteID) >= 8){
+            $query = "Select lid,toCHPS from ratings_config where usgs = $siteID";
             $result = $this->_db->query($query);
             if($result->num_rows == 0){
                 $this->logger->log("No NWS LID for USGS site $site",PEAR_LOG_DEBUG);
-                $this->usgs = $site;
+                $this->usgs = $siteID;
                 return false;
             }
             $row = $result->fetch_assoc();
-            $this->usgs = $site;       
+            $this->usgs = $siteID;
             $this->lid = $row['lid'];
             $this->toCHPS = $row['toCHPS'];
             return true;
         }
-        
+
         //If the site id == 5 this must be a nws lid identifier
-        if(strlen($site) == 5){
-            $query = "Select usgs,toCHPS from ratings_config where lid = '$site'";
+        if(strlen($siteID) == 5){
+            $query = "Select usgs,toCHPS from ratings_config where lid = '$siteID'";
             $result = $this->_db->query($query);
             if($result->num_rows == 0){
-                $this->logger->log("No USGS ID for  NWS site $site",PEAR_LOG_DEBUG);
+                $this->logger->log("No USGS ID for  NWS site $siteID",PEAR_LOG_DEBUG);
                 $this->lid = $site;
                 return false;
             }
             $row = $result->fetch_assoc();
-            $this->lid = $site;
+            $this->lid = $siteID;
             $this->usgs = $row['usgs'];
             $this->toCHPS = $row['toCHPS'];
             return true;
@@ -83,20 +83,20 @@ class RiverSite{
     public function getDBRatings(){
         $ratings = array();
         $this->ratings = array();
-        
+
 		if(strlen($this->lid)==5){
 			$query = "Select * from ratings where lid = '{$this->lid}' order by rating_shifted desc";
 		}
-		
+
         elseif($this->usgs > 0){
 			$query = "Select * from ratings where usgs = '{$this->usgs}' order by rating_shifted desc";
-		}	
+		}
         else{
 			$this->logger->log("No rating lid specified in getDBRatings subroutine.",PEAR_LOG_ERR);
 		}
-		
+
         //Get a list of ratings from the database
-		
+
         $result = $this->_db->query($query);
         if(!$result){
             $this->logger->log("No ratings in DB for {$this->lid} {$this->usgs}",PEAR_LOG_DEBUG);
@@ -120,10 +120,10 @@ class RiverSite{
 	 */
 
     public function getWebRating(){
-        
+
         $url = "http://waterdata.usgs.gov/nwisweb/data/ratings/exsa/USGS.".$this->usgs.".exsa.rdb";
         $this->source = 'USGS Online';
-        
+
         $this->logger->log("Url for RDB data for USGS site {$this->usgs} is $url",PEAR_LOG_DEBUG);
         if(!$this->usgs){
             $this->logger->log("Rating needs a USGS id defined to download it from the web",PEAR_LOG_WARNING);
@@ -137,7 +137,7 @@ class RiverSite{
         }
 
 		$this->logger->log("Downloaded RDB data for USGS site {$this->usgs}",PEAR_LOG_DEBUG);
-		
+
 		//Load the RDB rating into the object and return
         return $this->loadRDB($textdata);;
     }
@@ -159,16 +159,16 @@ class RiverSite{
         //Get Rating info from Database
         #$query = "Select USGSratid,rating_shifted,postingtime,source,raw_file,interpolate,minStage,maxStage from ratings where id = $id";
         $query = "Select * from ratings where id = $id";
-		
+
         $result = $this->_db->query($query);
         if(!$result){
             $this->logger->log("Problem getting rating from DB:".$this->_db->error,PEAR_LOG_ERR);
             return false;
         }
- 
+
         $row = $result->fetch_assoc();
         foreach($row as $k => $v) $rating[$k] = $v;
-		
+
         $query = "Select stage,shift,discharge from ratingtables where ratingID = $id";
         $result = $this->_db->query($query);
         if(!$result){
@@ -192,7 +192,7 @@ class RiverSite{
 	 * @param string piXML the piXML rating file string
 	 * @return boolean Returns true the rdb information was loaded into the site object
 	 */
-    
+
     function import_piXML($xml){
         $rating = array();
         $rating['raw_file'] = "<xmp>".$xml."</xmp>";
@@ -205,36 +205,36 @@ class RiverSite{
             return false;
         }
         $tz = (string)$xml_tree->timeZone;
-        
+
         foreach ($xml_tree->ratingCurve as $xmlrating){
             $this->lid = (string)$xmlrating->header->locationId;
             $date = $xmlrating->header->startDate['date']." ".$xmlrating->header->startDate['time'];
-            
+
             $rating['rating_shifted'] = $date;
 			$rating['raw_format'] = 'piXML';
             $stageUnit = strtolower((string)$xmlrating->header->stageUnit);
             if($stageUnit != 'ft'){
                 $this->logger->log("Rating needs to be in feet.",PEAR_LOG_ERR);
                 return false;
-            }    
+            }
             $dischargeUnit = strtolower((string)$xmlrating->header->dischargeUnit);
             if($dischargeUnit != 'cfs'){
                 $this->logger->log("Rating needs to be in cfs.",PEAR_LOG_ERR);
                 return false;
-            }    
+            }
             $rating['comment'] = (string)$xmlrating->header->comment;
             $this->source = (string)$xmlrating->header->sourceOrganisation;
-            
+
             if((string)$xmlrating->table->interpolationMethod == 'linear'){
                 $rating['interpolate'] = 'lin';
             }
             else{
                 $rating['interpolate'] = 'log';
-            }    
+            }
 
             $rating['minStage'] = (string)$xmlrating->table->minStage;
             $rating['maxStage'] = (string)$xmlrating->table->maxStage;
-            
+
             //Set the max stage to 9999 if specefied as 'INF' in pixml file
             if(strtoupper($rating['maxStage']) == 'INF')  $rating['maxStage'] = 9999;
             $rating['USGSratid'] = "NULL";
@@ -246,20 +246,20 @@ class RiverSite{
                 }
                 else{
                     $array['logScaleStageOffset'] = 0;
-                }    
+                }
                 $array['discharge'] = (string)$value['discharge'];
                 $rating['values'][] = $array;
-            }   
-            
+            }
+
             $this->ratings[] = $rating;
-            
-        }        
+
+        }
         return true;
-        
+
     }
 
-    
-    
+
+
 	/**
 	 * loadRDB
 	 *
@@ -288,6 +288,7 @@ class RiverSite{
         if(preg_match_all("/RATING SHIFTED=\"(.+?)\"/",$rdb,$matches)){
           $rating['rating_shifted'] =  date('Y-m-d H:i',strtotime($matches[1][0]));
         }
+        //Get the USGS ID number from RDB file and set the object ID
         if(preg_match_all("/NUMBER=\"(.+?)\"/",$rdb,$matches)){
             if(is_int($this->usgs) && ($this->usgs != trim($matches[1][0]))){
                 $this->logger->log("Opened RDB file did not match the site selected",PEAR_LOG_WARNING);
@@ -332,8 +333,8 @@ class RiverSite{
     }
 
 
-    
-    
+
+
 	/**
 	 * loadlocalRDB
 	 *
@@ -375,12 +376,12 @@ class RiverSite{
         $insertquery = "Insert into ratings (usgs,lid,postingtime,rating_shifted,source,USGSratid,interpolate,minStage,maxStage,raw_file,raw_format,comment) VALUES
             ('{$this->usgs}','{$this->lid}','$postingtime','{$this->ratings[0]['rating_shifted']}',
 			'{$this->source}',{$this->ratings[0]['USGSratid']},'{$this->ratings[0]['interpolate']}','{$this->ratings[0]['minStage']}','{$this->ratings[0]['maxStage']}','$rawFile','{$this->ratings[0]['raw_format']}','{$this->ratings[0]['comment']}')";
-        
-        #echo $insertquery."<br>"; 
+
+        #echo $insertquery."<br>";
         $this->_db->query($insertquery);
-       
+
         $ratid = $this->_db->insert_id;
-      
+
         if($this->_db->errno == 1062){
             $this->logger->log("dbInsertRating duplicate rating for {$this->usgs} {$this->lid}",PEAR_LOG_DEBUG);
             return false;      //Duplicate value exit out of ingest function
@@ -392,30 +393,30 @@ class RiverSite{
         }
 
 
-        
+
 		$columns = array();
         // Insert rating table into the 'ratingtables' table
 		foreach(array_keys($this->ratings[0]['values'][0]) as $key){
 			$columns[] = "$key";
 		}
-		
+
         for($i=0;$i<count($this->ratings[0]['values']);$i++){
 			$vals = array();
 			foreach($columns as $col){
 				$vals[] .= $this->ratings[0]['values'][$i][$col];
-			}	
+			}
 	        $values .= "($ratid,".implode($vals,',')."),";
         }
 
 		$values = rtrim($values,",");
         $insertquery = "Insert into ratingtables (ratingID,".implode($columns,",").") values $values";
-	
-        
-    
+
+
+
 		#echo $insertquery;
-		
+
         $result = $this->_db->query($insertquery);
-        
+
 
 
         if(($this->_db->error )&&($this->_db->errno != 1062)){
@@ -484,7 +485,7 @@ class RiverSite{
         $maxStage = 'INF';
         $stageUnit = 'FT';
         $dischargeUnit = 'CFS';
-         
+
         $piXML = new DOMDocument('1.0', 'utf-8');
         $root = $piXML->createElementNS('http://www.wldelft.nl/fews/PI','RatingCurves');
         $piXML->appendchild($root);
@@ -494,7 +495,7 @@ class RiverSite{
             'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation',
             'http://www.wldelft.nl/fews/PI http://chps1/schemas/pi-schemas/pi_ratingcurves.xsd');
-        
+
         $root->setAttributeNS(
             '',
             'version',
@@ -503,7 +504,7 @@ class RiverSite{
 
         $element = $piXML->createElement('timeZone','0.0');
         $root->appendChild($element);
-        
+
         $rating = $piXML->createElement('ratingCurve');
 
         //Build the piXML header
@@ -525,7 +526,7 @@ class RiverSite{
         $source = $piXML->createElement('sourceOrganisation',$this->ratings[0]['source']);
         $header->appendChild($source);
         $rating->appendChild($header);
-        
+
 
         //Build the piXML rating table
         $table = $piXML->createElement('table');
@@ -533,7 +534,7 @@ class RiverSite{
              $chpsMethod = 'linear';
         }else{
             $chpsMethod = 'logarithmic';
-        }    
+        }
         $intMeth = $piXML->createElement('interpolationMethod',$chpsMethod);
         $table->appendChild($intMeth);
         $minS = $piXML->createElement('minStage',$minStage);
@@ -548,21 +549,21 @@ class RiverSite{
             $rowAtt = $piXML->createAttribute('discharge');
             $rowAtt->value = $array['discharge'];
             $row->appendChild($rowAtt);
-            $table->appendChild($row);    
+            $table->appendChild($row);
         }
-        
+
         $rating->appendChild($table);
-            
+
         $root->appendChild($rating);
         $piXML->preserveWhiteSpace = false;
         $piXML->formatOutput = true;
         $xml = $piXML->saveXML();
 
     return $xml;
-        
+
     }
-    
-    
+
+
 	/**
 	 * hydroDspFormat
 	 *
@@ -591,19 +592,19 @@ class RiverSite{
         return $hdFormat;
     }
 
-    
- 
+
+
 	/**
 	 * ratingsToChps
 	 *
 	 * Sends a rating curve formats to Chps via the Ldad
 	 *     -RBD formatOutput   'rating_rdb_USGS.15097000.141120'
-     *     -TXT formatOutput   'rating_txt_USGS.15097000.141120' 
+     *     -TXT formatOutput   'rating_txt_USGS.15097000.141120'
 	 *
 	 * @access public
 	 * @return boolean Returns true if file transfer is successful
      *
-     *  NEED TO RE-FACTOR THIS AND IMRPOVE 
+     *  NEED TO RE-FACTOR THIS AND IMRPOVE
 	 */
 	public function ratingToChps($sa_oc){
         $success = true;
@@ -614,7 +615,7 @@ class RiverSite{
         if(!$this->toCHPS) {
             $this->logger->log("no piXML rating {$this->lid}, this site is not configured for CHPS",PEAR_LOG_INFO);
             return false;
-        }    
+        }
         //Send the CHPS pixml file to the LDAD
         //this file gets moved over to chps for ingest directly
 
@@ -625,14 +626,14 @@ class RiverSite{
         }else{
             $this->logger->log("Failed to save piXML rating {$this->lid}",PEAR_LOG_ERR);
             $success = false;
-        } 
-     
+        }
+
         return $success;
   	}
-  
 
 
-  
+
+
 
 	/**
 	 * ratingsToAwips
@@ -646,7 +647,7 @@ class RiverSite{
      * @param string 'oc' to transfer to OC 'sa' to transfer to fews SA
 	 * @return boolean Returns true if file transfer is successful
      *
-     *  NEED TO RE-FACTOR THIS AND IMRPOVE 
+     *  NEED TO RE-FACTOR THIS AND IMRPOVE
 	 */
 	public function ratingToAwips(){
 		//If the site object does not have ratings loaded, then load ratings
@@ -655,17 +656,17 @@ class RiverSite{
 		}
 
         $success = true;
-        
+
         //If there is a NWS lid established stage send the hydrodisplay and whfs formated rating curves to the ldad
         if($this->lid){
-            $HDfilename = TO_LDAD."rating_hydrodisplay_".strtolower($this->lid); 
+            $HDfilename = TO_LDAD."rating_hydrodisplay_".strtolower($this->lid);
             if(file_put_contents($HDfilename,$this->hydroDspFormat())){
                 chmod($HDfilename,0777);
                 $this->logger->log("Saved hydrodisplay rating in the toLDAD directory {$this->usgs}",PEAR_LOG_INFO);
             }else{
                 $this->logger->log("Failed to save hydroDspFormat rating {$this->usgs} ",PEAR_LOG_ERR);
                 $success = false;
-            }    
+            }
             $whfsfilename = TO_LDAD."rating_whfs_".$this->lid.".sql";
             if(file_put_contents($whfsfilename,$this->whfsFormat())){
                 chmod($whfsfilename,0777);
@@ -673,9 +674,9 @@ class RiverSite{
             }else{
                 $this->logger->log("Failed to save whfsFormat rating {$this->usgs} ",PEAR_LOG_ERR);
                 $success = false;
-            } 
+            }
         }
-        
+
         //Send the RDB file to the LDAD
         if(strlen($this->ratings[0]['raw_file'])>0 && ($this->ratings[0]['raw_format'] == 'USGSrdb')) {
             $rdbfilename = TO_LDAD."rating_rdb_USGS".$this->usgs.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted']));
@@ -686,10 +687,10 @@ class RiverSite{
                 $this->logger->log("Failed to save rdb rating {$this->usgs}",PEAR_LOG_ERR);
                 $success = false;
             }
-        }            
+        }
         else{
-            $this->logger->log("No RDB rating available for {$this->lid}",PEAR_LOG_INFO);   
-        }        
+            $this->logger->log("No RDB rating available for {$this->lid}",PEAR_LOG_INFO);
+        }
         return $success;
   	}
 
@@ -722,12 +723,12 @@ class RiverSite{
             $y++;
         }
         $numStage = count($allratings);
-      
+
         $y=0;
         foreach($allratings as $stage){
             $y++;
             if($y<($numStage/3)) continue;
-           
+
             $d = 0;
             if(isset($stage[0]) && isset($stage[1])){
                 $d = abs($stage[0]-$stage[1]);
@@ -735,10 +736,10 @@ class RiverSite{
             $avg = average($stage['all']);
             $stddev[] = variance($stage['all'])/$avg*100;
             $diff[] = ($d/$stage[0])*100;
-            
+
         }
-  
-       
+
+
         return array('totalvar' => max($stddev),
                      'recentvar' => max($diff));
     }

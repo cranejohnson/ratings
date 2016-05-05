@@ -6,13 +6,13 @@
  * 1. Check for newly update USGS ratings
  * 2. Ingest USGS rdb ratings and store them in a mysql db table(s)
  * 3. Format the rating for WHFS and hydrodisplay
- * 4. Keep track of historical ratings 
+ * 4. Keep track of historical ratings
  * 5. On command export a rating in both USGS RDB format, WHFS format and hydrodisplay format to re-ingest into AWIPS
  * 6. Be able to plot historic ratings side by side
  * 7. more......
  * @package APRFC Rating Tool
  * @author Crane Johnson <benjamin.johnson@noaa.gov>
- * @version 0.1 
+ * @version 0.1
  */
 
 ini_set('memory_limit', '512M');
@@ -28,14 +28,16 @@ require_once "/hd1apps/data/intranet/html/tools/PHPMailer/PHPMailerAutoload.php"
 require_once 'Log.php';
 
 /* Include Files for php graphing           */
-require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph.php';   
-require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_line.php';   
-require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_scatter.php';   
-require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_date.php';   
+require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph.php';
+require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_line.php';
+require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_scatter.php';
+require_once '/usr/local/apps/scripts/bcj/jpgraph/src/jpgraph_date.php';
 
 /* Include rating library file */
 require_once 'rating_lib.php';
 
+
+define("RATINGS_DEPOT","http://waterdata.usgs.gov/nwisweb/get_ratings");
 
 /**
  * Setup PEAR logging utility
@@ -76,7 +78,7 @@ if(LOG_TYPE == 'NULL'){
 /**
  * Define the debugging state, defaults to false
  */
- 
+
 if(isset($_POST['debug'])){
 	$debug = $_POST['debug'];
 }
@@ -99,7 +101,7 @@ $startTime = date('Y-m-d H:i:s',time()-5);
  */
 
 if(isset($_SERVER['REQUEST_METHOD'])){
-    
+
     include('/hd1apps/data/intranet/html/tools/xcrud_1_6_25/xcrud/xcrud.php');
 
     $log_results = Xcrud::get_instance();
@@ -166,7 +168,7 @@ if(isset($_SERVER['REQUEST_METHOD'])){
     $config_table->column_pattern('lid', '<a href="ratViewer.php?USGS={lid}" target="_blank" >{value}</a>');
     $config_table->column_width('lid,usgs,toCHPS','20px');
 
-    
+
 }
 
 
@@ -183,7 +185,7 @@ if(isset($_SERVER['REQUEST_METHOD'])){
  * @access public
  * @param logger object Error logging object
  * @param mysqli object mysqli database object
- * @param updatedSites array of sites updated 
+ * @param updatedSites array of sites updated
  * @param overRideEmail string email address(s) to use instead of the default
  * @return nothing
  *
@@ -200,36 +202,36 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'andrew.dixon@noaa.gov' => 'Andy',
        'edward.plumb@noaa.gov' => 'Ed',
        'Aaron.Jacobs@noaa.gov' => 'Aaron');
-       
+
     #debug temp
     #$recipients = array();
-    
+
     //If an overRideEmail is provided use that
     if($overRideEmail){
         $recipients = array(
         $overRideEmail => $overRideEmail);
-    }   
+    }
 
     if(count($updatedSites) > 1){
         $list = implode(',',$updatedSites);
     }
     elseif(count($updatedSites)==0){
         $list = 'NONE';
-    }    
+    }
     else{
         $list = $updatedSites[0];
-    }    
-    
+    }
+
     $log = "Date-Time                - Priority -           Message\r\n";
-   
+
     $query = "select * from log_table where ident like '%rating_tool.php%' and logtime > '$startTime' and priority < 7 order by logtime asc";
     $result = $mysqli->query($query);
     while($row = $result->fetch_assoc()){
-        $log .= "{$row['logtime']}  -     [{$row['priority']}]   - {$row['message']}\r\n"; 
-    }    
-    
+        $log .= "{$row['logtime']}  -     [{$row['priority']}]   - {$row['message']}\r\n";
+    }
 
- 
+
+
     $message = "The following sites had rating curves updated: $list\r\n\r\n";
     $message .="For detailed log information go here:\r\n";
     $message .="    1.  http://140.90.218.62/tools/rating_tool.php?site=&debug=true\r\n";
@@ -238,17 +240,17 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
         $riversite = new riverSite($logger,$mysqli,$riversite);
         $message .=  "LID: ".$riversite->lid." USGS:".$riversite->usgs."\r\n";
         $message .= "         Plot the last two rating curves http://140.90.218.62/tools/ratings/ratViewer.php?USGS=".$riversite->usgs."\r\n";
-        $message .= "         Link to usgs rating curve http://waterdata.usgs.gov/nwisweb/data/ratings/exsa/USGS.".$riversite->usgs.".exsa.rdb\r\n\r\n";    
-        
+        $message .= "         Link to usgs rating curve http://waterdata.usgs.gov/nwisweb/data/ratings/exsa/USGS.".$riversite->usgs.".exsa.rdb\r\n\r\n";
+
     }
     $message .= "\r\nLOG:\r\n".$log;
-    
+
 
     $mail = new PHPMailer;
     #$mail->From = 'nws.ar.aprfc@noaa.gov';
     $mail->FromName = 'nws.ar.aprfc';
     $mail->addAddress('benjamin.johnson@noaa.gov','Crane');
-   
+
     foreach($recipients as $email => $name)
     {
         $mail->AddAddress($email, $name);
@@ -257,18 +259,18 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
     $mail->Body = $message;
     foreach($Files as $file){
         $mail->addAttachment($file);
-    }   
+    }
     if(!$mail->send()) {
         echo 'Message could not be sent.';
         echo 'Mailer Error: ' . $mail->ErrorInfo;
         $logger->log("Failed to send Rating Email: ".$mail->ErrorInfo,PEAR_LOG_INFO);
     } else {
          $logger->log("Rating update email sent.",PEAR_LOG_INFO);
-         
+
     }
-   
-}    
-    
+
+}
+
 
 /**
  * loadArchive
@@ -296,7 +298,7 @@ function loadArchive($logger,$mysqli,$archivedir){
     	}
     }
     $logger->log("Loaded $i ratings from the archive directory:$archivedir",PEAR_LOG_INFO);
- 
+
 }
 
 
@@ -313,12 +315,13 @@ function loadArchive($logger,$mysqli,$archivedir){
  * @param sitefilter string grep pattern string to match against lines
  *                      default is '^(15|20)' filters for HI and AK
  * @return sites  array of usgs ratings that are in the usgs update file
- *                      
+ *
  */
 
 function get_updated_USGS_ratings($logger,$period = 1440,$sitefilter = '^(15|20)'){
     $sites = array();
-    $url = "http://waterdata.usgs.gov/nwisweb/get_ratings?period=$period";
+    $url = RATINGS_DEPOT."?period=$period";
+    #$url = "http://waterdata.usgs.gov/nwisweb/get_ratings?period=$period";
     $textdata = file_GET_contents($url);
     if(!$textdata){
       $logger->log("Unable to open usgs rating curve update file at $url",PEAR_LOG_ERR);
@@ -407,17 +410,17 @@ function variance($aValues, $bSample = false){
  * Create rating curve graphing
  * @param (object) $ratings rating curve object
  * @param  array $curves2plot  list of curves to plot, typically 0,1  (two most recent)
- * @return 
+ * @return
  */
- 
+
  function plotCurves($rCurves,$curves2plot){
     // Create a new timer instance
 	$datemax = strtotime('today midnight')+24*3600;
 	$datemin = $datemax-8*24*3600;
 	$timer = new JpgTimer();
-	
-	$created = date("F j, Y, g:i a");  
- 
+
+	$created = date("F j, Y, g:i a");
+
 	// Start the timer
 	$timer->Push();
     #print_r($rCurves);
@@ -431,7 +434,7 @@ function variance($aValues, $bSample = false){
 	$graph->title->SetFont(FF_ARIAL,FS_BOLD,12);
     $title = "Rating Curves for: ".$rCurves->lid." (".$rCurves->usgs.") \n(".sizeof($rCurves->ratings)." ratings in db shown in grey)";
 	$graph->title->Set($title);
-	$graph->SetBox(true,'black',2); 
+	$graph->SetBox(true,'black',2);
 	$graph->SetClipping(true);
     $grey = 80;
     $i = 0;
@@ -454,7 +457,7 @@ function variance($aValues, $bSample = false){
             $color = 'red';
             $line->SetLegend("Current Rating:".$rCurves->ratings[$curve]['rating_shifted']);
         }
-        elseif($y==1){   
+        elseif($y==1){
             $weight = 3;
             $color = 'blue';
             $line->SetLegend("Previous Rating:".$rCurves->ratings[$curve]['rating_shifted']);
@@ -464,27 +467,27 @@ function variance($aValues, $bSample = false){
             $color = array($grey,$grey,$grey);
             $grey = $grey + 5;
             if($grey > 220) $grey = 220;
-        }    
+        }
 		$line->SetColor($color);
 		$line->SetWeight($weight);
         $i++;
-        
+
     }
 	$graph->xaxis->SetFont(FF_ARIAL,FS_BOLD,10);
 	$graph->xaxis->SetPos('min');
 	$graph->xgrid->SetLineStyle('dashed');
 	$graph->xgrid->SetColor('gray');
-	$graph->xgrid->Show(); 
-	$graph->xaxis->SetTitle('Discharge (cfs)','middle'); 
-   
+	$graph->xgrid->Show();
+	$graph->xaxis->SetTitle('Discharge (cfs)','middle');
 
-	$graph->yaxis->SetTitle('Stage (ft)','middle'); 
+
+	$graph->yaxis->SetTitle('Stage (ft)','middle');
 	$graph->yaxis->SetFont(FF_ARIAL,FS_BOLD,12);
 	$graph->yaxis->title->SetFont(FF_ARIAL,FS_BOLD,14);
 	$graph->yaxis->scale->SetGrace(20,0);
 	#$graph->yaxis->SetTitlemargin(70);
 	$graph->SetFrame(true,'darkblue',0);
-    
+
     $fileName = "/hd1apps/data/intranet/html/cache/".$rCurves->lid.time().".png";
     $graph->Stroke($fileName);
     return($fileName);
@@ -529,11 +532,11 @@ if(php_sapi_name() == 'cli') {
     $sendemail = 'true';
 	$checkForAllNew = 'true';
 	$logger->log("Running from command line",PEAR_LOG_INFO);
-}    
+}
 
 //This is the basic action to perform for cronjobs
 if($action == 'checkForAllNew'){
-  
+
     $logger->log("Checking for USGS rating curves.",PEAR_LOG_INFO);
     //Load any new ratings into rating database and get a list of sites that were
     //updated.
@@ -549,7 +552,7 @@ if($action == 'allCurves'){
     if(!$result){
         $logger->log("Failed to query database for all ratings going to CHPS",PEAR_LOG_DEBUG);
     }
-        
+
     while($row = $result->fetch_assoc()){
         array_push($sites,$row['lid']);
     }
@@ -572,14 +575,14 @@ if($action == 'importPiXML'){
 
 			$logger->log("Moved file:".$_FILES['upload']['name'][$i]." to archive directory",PEAR_LOG_INFO);
             $path_parts = pathinfo($newFilePath);
-            
+
 			$site = new riverSite($logger,$mysqli);
 		    if($path_parts['extension'] == 'xml'){
                 if(!$site->import_piXML(file_GET_contents($newFilePath))){
                     $logger->log("Failed to read piXML: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
                     //continue to next file!!!!!!!!
                     continue;
-                }    
+                }
             }
             elseif($path_parts['extension'] == 'rdb'){
                 if(!$site->loadRDB(file_GET_contents($newFilePath))){
@@ -587,15 +590,15 @@ if($action == 'importPiXML'){
                     //continue to next file!!!!!!!!
                     continue;
                 }
-             }   
+             }
             else{
                 $logger->log("Unknown File type: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
             }
-            
-            
+
+
 			if($site->dbInsertRating()){
 				array_push($sites,$site->lid);
-			} 
+			}
 			else{
 				$logger->log("Failed to push into database.",PEAR_LOG_ERR);
 			}
@@ -603,50 +606,50 @@ if($action == 'importPiXML'){
 		}
 		else{
 			$logger->log("Failed to move file:".$_FILES['upload']['name'][$i]." to archive directory",PEAR_LOG_ERR);
-		}    
+		}
 	  }
 	}
-}        
-  
+}
 
-  
+
+
 $sitesUpdated = array();
 $graphFiles = array();
-    
-//Process each site    
+
+//Process each site
 foreach($sites as $site){
 	echo "working on $site<br>";
     if(!$site) {
         $logger->log("No site specified to update!",PEAR_LOG_NOTICE);
     }
     else{
-        
+
         $riversite = new riverSite($logger,$mysqli,$site);
-		
+
         $logger->log("Updating {$riversite->lid}",PEAR_LOG_INFO);
-		
+
 		//Check the USGS site and see if a new curve is available
 		if($checkForNew){
 			echo "Checking for USGS rating.<br>";
 			if($riversite->getWebRating()){
 
 				if($ratid = $riversite->dbInsertRating()){
-					
+
 					$ratingsUpdated[] = $site->usgs;
 				}
 			}
 			else{
 				$logger->log("Failed to get USGS web rating for $site",PEAR_LOG_WARNING);
-			}    
+			}
         }
         $sentto = array();
-        
+
 		//Get ratings from local database and send them to where then need to go
         if($riversite->getDBRatings()>0){
-            
+
 			//Graph the curves with jpgraph and add the file path/name to the array
             $graphFiles[]=plotCurves($riversite,array(0,1));
-            
+
             if(in_array('chpsOC',$sendTo)){
                 //Send the rating to chps
                 if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
@@ -654,15 +657,15 @@ foreach($sites as $site){
             if(in_array('awips',$sendTo)){
                 //Send the rating to AWIPS
                 if($riversite->ratingToAwips()) $sentto[] = 'AWIPS';
-            }    
+            }
             if(in_array('fewsSA',$sendTo)){
 				//Send the rating to a fews sa
                 if($riversite->ratingToChps('sa')) $sentto[] = 'CHPS Fews SA';
 
             }
-            
-            if(count($sentto) > 0) $sitesUpdated[] = $site;                    
-           
+
+            if(count($sentto) > 0) $sitesUpdated[] = $site;
+
         }
         else{
             $logger->log("No ratings found for site {$riversite->lid} {$riversite->usgs}",PEAR_LOG_WARNING);
@@ -670,7 +673,7 @@ foreach($sites as $site){
         $logger->log("COMPLETED updating {$riversite->lid}",PEAR_LOG_INFO);
     }
 }
- 
+
 
 if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
 
@@ -692,7 +695,7 @@ if($action == 'stability') {
             echo $query."<br>";
         }
     }
-}    
+}
 
 $logger->log("END",PEAR_LOG_INFO);
 
@@ -708,11 +711,11 @@ if(php_sapi_name() === 'cli') exit;
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <script src="//code.jquery.com/jquery-1.9.1.js"></script>
     <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-  
+
   	</head>
 
 	<body>
-	
+
    <!-- <form action="xml_upload.php" method="post" enctype="multipart/form-data">
     </form>-->
     <form id="riverform" method="get" action="ratViewer.php">
@@ -722,13 +725,13 @@ if(php_sapi_name() === 'cli') exit;
     </form>
 	<h3>1. Select a process to update rating curves(s):</h3>
     <form id="riverform"  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-        <input type="radio" name="action" value="importPiXML" id="fileRadio" >Import pi-XML rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
+        <input type="radio" name="action" value="importPiXML" id="fileRadio" >Import pi-XML or RDB rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
 		<!--<input type="radio" name="action" value="allCurves">Send the most recent rating curve for each site in the database<br>-->
     	<input type="radio" name="action" value="checkForAllNew">Check for new USGS Ratings for ALL SITES<br>
 		<input type="radio" name="action" value="checkUSGS">Check USGS rating Depot for a Specific Site(s):<br>
         <input type="radio" name="action" value="sendFromDB">Send existing rating curves from database for Site(s): <br><br>
 		Sites:<input type='text' name='site' size="50" value="">
-		
+
         <h3>2. Send most recent curves to:</h3>
 		<input type="checkbox" name="sendTo[]" value="chpsOC" checked>CHPS OC
         <input type="checkbox" name="sendTo[]" value="fewsSA">CHPS Fews SA
@@ -738,9 +741,9 @@ if(php_sapi_name() === 'cli') exit;
 		<input type="checkbox" name="debug" value="true">Show Debug Log<br>
         <input type="checkbox" name="sendemail" value="true">Send email with process log<br>
 		<br>
-        
-       
-        
+
+
+
       	<input id="submit_button" type="submit" value="Submit">
     </form>
     Note: Up to 5 min delay for curves to be sent to AWIPS after stage.  Check log for results.
