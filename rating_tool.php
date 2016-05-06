@@ -312,14 +312,14 @@ function loadArchive($logger,$mysqli,$archivedir){
  * @access public
  * @param logger object Error logging object
  * @param period integer the number of hours back to look for changes
- *                      defaults to 1440 hours (60 days)
+ *                      defaults to 168 hours (7 days)
  * @param sitefilter string grep pattern string to match against lines
  *                      default is '^(15|20)' filters for HI and AK
  * @return sites  array of usgs ratings that are in the usgs update file
  *
  */
 
-function get_updated_USGS_ratings($logger,$period = 1440,$sitefilter = '^(15|20)'){
+function get_updated_USGS_ratings($logger,$period = 168,$sitefilter = '^(15|20)'){
     $sites = array();
     $url = RATINGS_DEPOT."?period=$period";
     #$url = "http://waterdata.usgs.gov/nwisweb/get_ratings?period=$period";
@@ -356,7 +356,7 @@ function get_updated_USGS_ratings($logger,$period = 1440,$sitefilter = '^(15|20)
  * @param logger object Error logging object
  * @param mysqli object mysqli database object
  * @param period integer the number of hours back to look for changes
- *                      defaults to 1440 hours (60 days)
+ *                      defaults to 168 hours (7 days)
  * @param sitefilter string grep pattern string to match against lines
  *                      default is '^(15|20)' filters for HI and AK
  * @return array List of ratings that were updated
