@@ -34,7 +34,7 @@ class RiverSite{
 	 * @return boolean Returns true if the site was found in the db table
 	 */
 
-    private function getConfigInfo($siteID{
+    private function getConfigInfo($siteID){
         //If the site id > 8 this must be a usgs identifier
         if(strlen($siteID) >= 8){
             $query = "Select lid,toCHPS from ratings_config where usgs = $siteID";
@@ -57,7 +57,7 @@ class RiverSite{
             $result = $this->_db->query($query);
             if($result->num_rows == 0){
                 $this->logger->log("No USGS ID for  NWS site $siteID",PEAR_LOG_DEBUG);
-                $this->lid = $site;
+                $this->lid = $siteID;
                 return false;
             }
             $row = $result->fetch_assoc();
@@ -332,7 +332,77 @@ class RiverSite{
         return true;
     }
 
+	/**
+	 * loadCSV
+	 *
+	 * This private method loads an RDB rating into the site object.
+	 *
+	 * @access private
+	 * @param string csv the csv rating file string
+	 * @return boolean Returns true the rdb information was loaded into the site object
+	 */
 
+    function loadCSV($csv){
+
+        $commentLines = '#';
+        $rating = array();
+        $rating['raw_file'] = $csv;
+
+        $rating['raw_format'] = 'CSVupload';
+		$rating['minStage'] = 0;
+		$rating['maxStage'] = 9999;
+        $rating['interpolate'] = 'log';
+        $rating['comment'] = '';
+        $rating['USGSratid'] = 'null';
+        $this->source = '';
+        
+        //Look through the RDB file and extract: USGS ID, Rating Number and Shift Date
+
+        if(preg_match_all("/RATING SHIFTED= *\"(.+?)\"/",$csv,$matches)){
+            $rating['rating_shifted'] =  date('Y-m-d H:i',strtotime($matches[1][0]));
+        }
+        else{
+            $this->logger->log("Failed to get the shift date from csv file",PEAR_LOG_ERR);
+            return false;
+        }    
+ 
+        //Get the NWSLID from CSV file and set the object ID
+        if(preg_match_all("/NWSLID= *\"(.+?)\"/",$csv,$matches)){
+            $nwslid = strtoupper($matches[1][0]);
+            $this->lid = $nwslid;
+        }
+        else{
+          $this->logger->log("Failed to get NWSLID from csv file",PEAR_LOG_ERR);
+          return false;
+        }
+ 
+        //Explode csv file into lines
+        $data = explode("\n", $csv);
+        if(count($data) == 0){
+            $this->logger->log("No rating curve information for {$this->usgs}",PEAR_LOG_ERR);
+            return false;
+        }
+        $reading_header = true;
+        $i =0;
+
+        //Read through rdb file lines and ignore header information
+        foreach($data as $row){
+            if(preg_match("/^$commentLines/",$row)) continue;
+            $i++;
+            $parts = preg_split('/,/',$row);
+            if(count($parts) <2) continue;
+            //Only use stage values that are on the 1/10 of a foot interval to minimize
+            //data stored in the database
+            if(floor($parts[0]*10) == ($parts[0]*10)){
+                $array['stage'] = $parts[0];
+                $array['discharge'] = $parts[1];
+                $rating['values'][] = $array;
+            }
+        }
+        //Append this current rating to the ratings loaded for the site object
+        $this->ratings[] = $rating;
+        return true;
+    }
 
 
 	/**
@@ -373,6 +443,7 @@ class RiverSite{
 
         // Insert rating information into the 'ratings' table
         $rawFile = $this->_db->real_escape_string($this->ratings[0]['raw_file']);
+       
         $insertquery = "Insert into ratings (usgs,lid,postingtime,rating_shifted,source,USGSratid,interpolate,minStage,maxStage,raw_file,raw_format,comment) VALUES
             ('{$this->usgs}','{$this->lid}','$postingtime','{$this->ratings[0]['rating_shifted']}',
 			'{$this->source}',{$this->ratings[0]['USGSratid']},'{$this->ratings[0]['interpolate']}','{$this->ratings[0]['minStage']}','{$this->ratings[0]['maxStage']}','$rawFile','{$this->ratings[0]['raw_format']}','{$this->ratings[0]['comment']}')";

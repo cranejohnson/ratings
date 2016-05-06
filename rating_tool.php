@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * Php Script to handle APRFC ratings curves
  *
@@ -201,7 +201,8 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'robert.oslund@noaa.gov' => 'Rob',
        'andrew.dixon@noaa.gov' => 'Andy',
        'edward.plumb@noaa.gov' => 'Ed',
-       'Aaron.Jacobs@noaa.gov' => 'Aaron');
+       'Aaron.Jacobs@noaa.gov' => 'Aaron',
+       'crane@whitewinter.net' => 'Crane');
 
     #debug temp
     #$recipients = array();
@@ -360,12 +361,12 @@ function get_updated_USGS_ratings($logger,$period = 1440,$sitefilter = '^(15|20)
  *                      default is '^(15|20)' filters for HI and AK
  * @return array List of ratings that were updated
  */
-function loadUSGSWebRatings($logger,$mysqli,$period = 1440,$sitefilter = '^(15|20)'){
+function loadUSGSWebRatings($logger,$mysqli,$period = 168,$sitefilter = '^(15|20)'){
   $usgsListing = get_updated_USGS_ratings($logger);
   $ratingsUpdated = array();
 
-  foreach($usgsListing as $site){
-        $site = new riverSite($logger,$mysqli,$site);
+  foreach($usgsListing as $siteID){
+        $site = new riverSite($logger,$mysqli,$siteID);
         if($site->getWebRating()){
             if($ratid = $site->dbInsertRating()){
                 $ratingsUpdated[] = $site->usgs;
@@ -558,7 +559,7 @@ if($action == 'allCurves'){
     }
 }
 
-if($action == 'importPiXML'){
+if($action == 'importFile'){
 	//Loop through each file
 	for($i=0; $i<count($_FILES['upload']['name']); $i++) {
 
@@ -569,7 +570,7 @@ if($action == 'importPiXML'){
 	  //Make sure we have a filepath
 	  if ($tmpFilePath != ""){
 		//Setup our new file path
-		$newFilePath = "./uploaded_pixml/".$_FILES['upload']['name'][$i];
+		$newFilePath = "./uploaded_ratings/".$_FILES['upload']['name'][$i];
 		//Upload the file into the temp dir
 		if(move_uploaded_file($tmpFilePath, $newFilePath)) {
 
@@ -585,12 +586,17 @@ if($action == 'importPiXML'){
                 }
             }
             elseif($path_parts['extension'] == 'rdb'){
-                if(!$site->loadRDB(file_GET_contents($newFilePath))){
+                if(!$site->loadLocalRDB($newFilePath)){
+                    continue;
+                }    
+             }
+            elseif($path_parts['extension'] == 'csv'){
+                if(!$site->loadCSV(file_GET_contents($newFilePath))){
                     $logger->log("Failed to read RDB: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
                     //continue to next file!!!!!!!!
                     continue;
                 }
-             }
+             } 
             else{
                 $logger->log("Unknown File type: ".$_FILES['upload']['name'][$i],PEAR_LOG_ERR);
             }
@@ -612,11 +618,12 @@ if($action == 'importPiXML'){
 }
 
 
-
+//Array of sites that are updated
 $sitesUpdated = array();
 $graphFiles = array();
 
 //Process each site
+
 foreach($sites as $site){
 	echo "working on $site<br>";
     if(!$site) {
@@ -725,7 +732,7 @@ if(php_sapi_name() === 'cli') exit;
     </form>
 	<h3>1. Select a process to update rating curves(s):</h3>
     <form id="riverform"  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-        <input type="radio" name="action" value="importPiXML" id="fileRadio" >Import pi-XML or RDB rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
+        <input type="radio" name="action" value="importFile" id="fileRadio" >Import pi-XML, RDB or csv rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
 		<!--<input type="radio" name="action" value="allCurves">Send the most recent rating curve for each site in the database<br>-->
     	<input type="radio" name="action" value="checkForAllNew">Check for new USGS Ratings for ALL SITES<br>
 		<input type="radio" name="action" value="checkUSGS">Check USGS rating Depot for a Specific Site(s):<br>
