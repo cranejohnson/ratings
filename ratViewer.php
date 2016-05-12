@@ -121,7 +121,7 @@ $ratingDetails->change_type('comment','textarea');
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
     <script src="../../javascript/highcharts_reg.js"> </script>
-    <script src="http://highslide-software.github.io/export-csv/export-csv.js"></script>
+    <script src="http://highcharts.github.io/export-csv/export-csv.js"></script>
 
 
     <script>
