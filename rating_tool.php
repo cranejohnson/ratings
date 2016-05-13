@@ -516,7 +516,7 @@ if (isset($_POST["sendTo"])){
 }
 
 if (isset($_POST["site"])){
-    $sites = explode(',',$_POST['site']);
+    $sites = explode(',',strtoupper($_POST['site']));
 }
 
 if (isset($_POST["sendemail"])){
