@@ -360,6 +360,7 @@ class RiverSite{
 
         if(preg_match_all("/RATING SHIFTED= *\"(.+?)\"/",$csv,$matches)){
             $rating['rating_shifted'] =  date('Y-m-d H:i',strtotime($matches[1][0]));
+            $this->logger->log("CSV file shift date:".$rating['rating_shifted'],PEAR_LOG_DEBUG);
         }
         else{
             $this->logger->log("Failed to get the shift date from csv file",PEAR_LOG_ERR);
@@ -367,9 +368,11 @@ class RiverSite{
         }    
  
         //Get the NWSLID from CSV file and set the object ID
-        if(preg_match_all("/NWSLID= *\"(.+?)\"/",$csv,$matches)){
+        preg_match_all("/NWSLID= *\"(.+?)\"/",$csv,$matches);
+        if(strlen($matches[1][0])>0){
             $nwslid = strtoupper($matches[1][0]);
             $this->lid = $nwslid;
+            $this->logger->log("CSV file id:".$nwslid,PEAR_LOG_DEBUG);
         }
         else{
           $this->logger->log("Failed to get NWSLID from csv file",PEAR_LOG_ERR);
@@ -394,8 +397,8 @@ class RiverSite{
             //Only use stage values that are on the 1/10 of a foot interval to minimize
             //data stored in the database
             if(floor($parts[0]*10) == ($parts[0]*10)){
-                $array['stage'] = $parts[0];
-                $array['discharge'] = $parts[1];
+                $array['stage'] = trim($parts[0]);
+                $array['discharge'] = trim($parts[1]);
                 $rating['values'][] = $array;
             }
         }
@@ -491,8 +494,9 @@ class RiverSite{
 
 
         if(($this->_db->error )&&($this->_db->errno != 1062)){
+            $this->logger->log("Db error inserting rating:".$this->_db->error,PEAR_LOG_ERR);
             $this->_db->query("delete from ratings where id = $ratid");
-            $this->logger->log("dbInsertRating error rolled back id=$ratid:".$this->_db->error,PEAR_LOG_ERR);
+            $this->logger->log("dbInsertRating error rolled back id=$ratid",PEAR_LOG_ERR);
             return false;
         }
 
