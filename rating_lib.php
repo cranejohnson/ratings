@@ -13,14 +13,20 @@ class RiverSite{
     public $toCHPS = '';
 
 
-    public function __construct($logger,$db,$site=false) {
+    public function __construct($logger,$db=null,$site=false) {
         // Check the db resource
-        if (!$db->ping()) {
-            $this->logger->log("Not a valid database connection",PEAR_LOG_ERR);
+        if($db){
+            if (!$db->ping()) {
+                $this->logger->log("Not a valid database connection",PEAR_LOG_ERR);
+            }
+            $this->_db = $db;
+            if($site) $this->getConfigInfo($site);
+        }
+        else{
+            $this->_db = null;
         }
         $this->logger = $logger;
-        $this->_db = $db;
-        if($site) $this->getConfigInfo($site);
+
     }
 
 	/**
@@ -35,10 +41,13 @@ class RiverSite{
 	 */
 
     private function getConfigInfo($siteID){
+        if($this->_db == null) return false;
+
         //If the site id > 8 this must be a usgs identifier
         if(strlen($siteID) >= 8){
             $query = "Select lid,toCHPS from ratings_config where usgs = $siteID";
             $result = $this->_db->query($query);
+
             if($result->num_rows == 0){
                 $this->logger->log("No NWS LID for USGS site $siteID",PEAR_LOG_DEBUG);
                 $this->usgs = $siteID;
@@ -355,7 +364,7 @@ class RiverSite{
         $rating['comment'] = '';
         $rating['USGSratid'] = 'null';
         $this->source = '';
-        
+
         //Look through the RDB file and extract: USGS ID, Rating Number and Shift Date
 
         if(preg_match_all("/RATING SHIFTED= *\"(.+?)\"/",$csv,$matches)){
@@ -365,8 +374,8 @@ class RiverSite{
         else{
             $this->logger->log("Failed to get the shift date from csv file",PEAR_LOG_ERR);
             return false;
-        }    
- 
+        }
+
         //Get the NWSLID from CSV file and set the object ID
         preg_match_all("/NWSLID= *\"(.+?)\"/",$csv,$matches);
         if(strlen($matches[1][0])>0){
@@ -378,7 +387,7 @@ class RiverSite{
           $this->logger->log("Failed to get NWSLID from csv file",PEAR_LOG_ERR);
           return false;
         }
- 
+
         //Explode csv file into lines
         $data = explode("\n", $csv);
         if(count($data) == 0){
@@ -393,16 +402,16 @@ class RiverSite{
             if(preg_match("/^$commentLines/",$row)) continue;
             $i++;
             $parts = preg_split('/,/',$row);
-            
+
             if(count($parts) <2) continue;
-            
+
             //Only use stage values that are on the 1/10 of a foot interval to minimize
             //data stored in the database
-           
+
             $array['stage'] = trim($parts[0]);
             $array['discharge'] = trim($parts[1]);
             $rating['values'][] = $array;
-          
+
         }
         //Append this current rating to the ratings loaded for the site object
         $this->ratings[] = $rating;
@@ -448,7 +457,7 @@ class RiverSite{
 
         // Insert rating information into the 'ratings' table
         $rawFile = $this->_db->real_escape_string($this->ratings[0]['raw_file']);
-       
+
         $insertquery = "Insert into ratings (usgs,lid,postingtime,rating_shifted,source,USGSratid,interpolate,minStage,maxStage,raw_file,raw_format,comment) VALUES
             ('{$this->usgs}','{$this->lid}','$postingtime','{$this->ratings[0]['rating_shifted']}',
 			'{$this->source}',{$this->ratings[0]['USGSratid']},'{$this->ratings[0]['interpolate']}','{$this->ratings[0]['minStage']}','{$this->ratings[0]['maxStage']}','$rawFile','{$this->ratings[0]['raw_format']}','{$this->ratings[0]['comment']}')";
