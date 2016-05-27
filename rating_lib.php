@@ -40,7 +40,7 @@ class RiverSite{
             $query = "Select lid,toCHPS from ratings_config where usgs = $siteID";
             $result = $this->_db->query($query);
             if($result->num_rows == 0){
-                $this->logger->log("No NWS LID for USGS site $site",PEAR_LOG_DEBUG);
+                $this->logger->log("No NWS LID for USGS site $siteID",PEAR_LOG_DEBUG);
                 $this->usgs = $siteID;
                 return false;
             }
@@ -347,7 +347,7 @@ class RiverSite{
         $commentLines = '#';
         $rating = array();
         $rating['raw_file'] = $csv;
-
+        $rating['values'] = array();
         $rating['raw_format'] = 'CSVupload';
 		$rating['minStage'] = 0;
 		$rating['maxStage'] = 9999;
@@ -360,7 +360,7 @@ class RiverSite{
 
         if(preg_match_all("/RATING SHIFTED= *\"(.+?)\"/",$csv,$matches)){
             $rating['rating_shifted'] =  date('Y-m-d H:i',strtotime($matches[1][0]));
-            $this->logger->log("CSV file shift date:".$rating['rating_shifted'],PEAR_LOG_DEBUG);
+            $this->logger->log("CSV file shift date:".$rating['rating_shifted'],PEAR_LOG_INFO);
         }
         else{
             $this->logger->log("Failed to get the shift date from csv file",PEAR_LOG_ERR);
@@ -372,7 +372,7 @@ class RiverSite{
         if(strlen($matches[1][0])>0){
             $nwslid = strtoupper($matches[1][0]);
             $this->lid = $nwslid;
-            $this->logger->log("CSV file id:".$nwslid,PEAR_LOG_DEBUG);
+            $this->logger->log("CSV file id:".$nwslid,PEAR_LOG_INFO);
         }
         else{
           $this->logger->log("Failed to get NWSLID from csv file",PEAR_LOG_ERR);
@@ -393,14 +393,16 @@ class RiverSite{
             if(preg_match("/^$commentLines/",$row)) continue;
             $i++;
             $parts = preg_split('/,/',$row);
+            
             if(count($parts) <2) continue;
+            
             //Only use stage values that are on the 1/10 of a foot interval to minimize
             //data stored in the database
-            if(floor($parts[0]*10) == ($parts[0]*10)){
-                $array['stage'] = trim($parts[0]);
-                $array['discharge'] = trim($parts[1]);
-                $rating['values'][] = $array;
-            }
+           
+            $array['stage'] = trim($parts[0]);
+            $array['discharge'] = trim($parts[1]);
+            $rating['values'][] = $array;
+          
         }
         //Append this current rating to the ratings loaded for the site object
         $this->ratings[] = $rating;
