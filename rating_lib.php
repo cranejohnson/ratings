@@ -15,6 +15,7 @@ class RiverSite{
 
     public function __construct($logger,$db=null,$site=false) {
         // Check the db resource
+        $this->logger = $logger;
         if($db){
             if (!$db->ping()) {
                 $this->logger->log("Not a valid database connection",PEAR_LOG_ERR);
@@ -25,7 +26,7 @@ class RiverSite{
         else{
             $this->_db = null;
         }
-        $this->logger = $logger;
+        
 
     }
 
