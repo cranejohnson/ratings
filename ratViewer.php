@@ -26,7 +26,8 @@
     $admin = false;
   }  
   if(!($stage = $_GET['stage'])) $stage = 'x';
-  $hcSeries = array();   
+  $hcSeries = array(); 
+  $measSeries = array();
   $xtitle = 'Stage (ft)';
   $ytitle = 'Discharge (cfs)';	
   
@@ -48,23 +49,52 @@
     $res = $mysqli->query($query) or die($mysqli->error);
     $values = array();
      
-	if($stage == 'y'){
+    if($stage == 'y'){
         $ytitle = 'Stage (ft)';
         $xtitle = 'Discharge (cfs)';	
-	      while($ratrow = $res->fetch_array()){
-		 	$values[] = array((float)$ratrow['discharge'],(float)$ratrow['stage']);
-		}
+        while($ratrow = $res->fetch_array()){
+        $values[] = array((float)$ratrow['discharge'],(float)$ratrow['stage']);
+        }
     }
-	else{
+    else{
     while($ratrow = $res->fetch_array()){
-       	$values[] = array((float)$ratrow['stage'],(float)$ratrow['discharge']);        
- 	}
+        $values[] = array((float)$ratrow['stage'],(float)$ratrow['discharge']);        
+    }
       }
       $series['data'] = $values;
       if($i>=2) $series['visible'] = false;
       $hcSeries[] = $series;        
       $i++;	              
   }  
+  
+  $query = "SELECT * FROM qMeasured where lid = '$id' order by date desc";
+  $result = $mysqli->query($query) or die($mysqli->error);
+  $i = 0; 
+  $values = array();
+  $series = array();
+  $series['name'] = "Measured Values";
+  $series['type'] = 'scatter';
+  $series['tooltip']['formatter'] = 'function(){return this.measDate+\'<br />\'+this.x+\'<br />\'+this.y';
+  $series['tooltip']['headerFormat'] ='Taken: {point.measDate}<br />';
+  while($row = $result->fetch_array()){
+    $data = array();
+    if($stage == 'y'){
+        $data['y'] = (float)$row['hg_meas'];
+        $data['x'] = (float)$row['qr_meas'];
+    }else{
+        $data['x'] = (float)$row['hg_meas'];
+        $data['y'] = (float)$row['qr_meas'];
+    }
+    $data['measDate'] = $row['date'];
+
+    $values[] = $data;
+  }
+  
+  $series['data'] = $values;
+  $hcSeries[] = $series;        
+               
+
+  
 
 #echo json_encode($hcSeries);
 
@@ -195,6 +225,7 @@ $ratingDetails->change_type('comment','textarea');
                 //pointFormat: '<b>{point.y}</b>',
             },
         series: <?php echo json_encode($hcSeries); ?>
+             
 
         });
         var chart = $('#container').highcharts(),
