@@ -67,7 +67,7 @@
       $i++;	              
   }  
   
-  $query = "SELECT * FROM qMeasured where lid = '$id' order by date desc";
+  $query = "SELECT * FROM qMeasured where lid = '$id' and hg_meas is not null order by date desc";
   $result = $mysqli->query($query) or die($mysqli->error);
   $i = 0; 
   $values = array();
