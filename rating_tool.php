@@ -235,7 +235,7 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
 
     $message = "The following sites had rating curves updated: $list\r\n\r\n";
     $message .="For detailed log information go here:\r\n";
-    $message .="    1.  http://140.90.218.62/tools/rating_tool.php?site=&debug=true\r\n";
+    $message .="    1.  http://140.90.218.62/tools/ratings/rating_tool.php?site=&debug=true\r\n";
     $message .="    2.  /awips/hydroapps/local/ratings/whfs_import.log\r\n\r\n\r\n";
     foreach($updatedSites as $riversite){
         $riversite = new riverSite($logger,$mysqli,$riversite);
