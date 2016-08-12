@@ -677,7 +677,7 @@ foreach($sites as $site){
 }
 
 
-#if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
+if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
 
 $coeSites = array('CRHA2','UCHA2','MCDA2','CHLA2','CHFA2','TAFA2');
 $coeUpdated = array_intersect($coeSites,$sitesUpdated);
