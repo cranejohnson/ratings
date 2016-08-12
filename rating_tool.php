@@ -201,19 +201,14 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'robert.oslund@noaa.gov' => 'Rob',
        'andrew.dixon@noaa.gov' => 'Andy',
        'edward.plumb@noaa.gov' => 'Ed',
-       'Aaron.Jacobs@noaa.gov' => 'Aaron',
-       'crane@whitewinter.net' => 'Crane');
-
-    #debug temp
-    #$recipients = array();
-
+       'Aaron.Jacobs@noaa.gov' => 'Aaron');
+  
     //If an overRideEmail is provided use that
     if($overRideEmail){
-        $recipients = array(
-        $overRideEmail => $overRideEmail);
+        $recipients = $overRideEmail;
     }
 
-    if(count($updatedSites) > 1){
+    if(count($updatedSites) > 0){
         $list = implode(',',$updatedSites);
     }
     elseif(count($updatedSites)==0){
@@ -240,7 +235,7 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
     foreach($updatedSites as $riversite){
         $riversite = new riverSite($logger,$mysqli,$riversite);
         $message .=  "LID: ".$riversite->lid." USGS:".$riversite->usgs."\r\n";
-        $message .= "         Plot the last two rating curves http://140.90.218.62/tools/ratings/ratViewer.php?USGS=".$riversite->usgs."\r\n";
+        $message .= "         Plot the last two rating curves http://140.90.218.62/tools/ratings/ratViewer.php?USGS=".$riversite->usgs." (NWS Internal)\r\n";
         $message .= "         Link to usgs rating curve http://waterdata.usgs.gov/nwisweb/data/ratings/exsa/USGS.".$riversite->usgs.".exsa.rdb\r\n\r\n";
 
     }
@@ -248,7 +243,7 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
 
 
     $mail = new PHPMailer;
-    #$mail->From = 'nws.ar.aprfc@noaa.gov';
+    
     $mail->FromName = 'nws.ar.aprfc';
     $mail->addAddress('benjamin.johnson@noaa.gov','Crane');
 
@@ -489,7 +484,7 @@ function variance($aValues, $bSample = false){
 	#$graph->yaxis->SetTitlemargin(70);
 	$graph->SetFrame(true,'darkblue',0);
 
-    $fileName = "/hd1apps/data/intranet/html/cache/".$rCurves->lid.time().".png";
+    $fileName = "/hd1apps/data/intranet/html/cache/".$rCurves->lid.date('_dMy').".png";
     $graph->Stroke($fileName);
     return($fileName);
 }
@@ -530,7 +525,7 @@ if($action == 'checkUSGS') $checkForNew = true;
 if(php_sapi_name() == 'cli') {
     $action = 'checkForAllNew';
 	$sendTo = array('chpsOC','awips');
-    $sendemail = 'true';
+        $sendemail = 'true';
 	$checkForAllNew = 'true';
 	$logger->log("Running from command line",PEAR_LOG_INFO);
 }
@@ -682,7 +677,23 @@ foreach($sites as $site){
 }
 
 
-if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
+#if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
+
+$coeSites = array('CRHA2','UCHA2','MCDA2','CHLA2','CHFA2','TAFA2');
+$coeUpdated = array_intersect($coeSites,$sitesUpdated);
+$coeFiles = array();
+$coeRecipients = array(
+       'cepoaencwhh@usace.army.mil' =>'HH');
+
+foreach($graphFiles as $file){
+        foreach($coeSites as $s){
+		if(strpos($file,$s) !==false) $coeFiles[] = $file;
+        }
+}
+
+if(count($coeUpdated) > 0) sendEmail($logger,$mysqli,$coeUpdated,$coeFiles,$coeRecipients);
+
+
 
 
 

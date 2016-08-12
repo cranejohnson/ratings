@@ -74,10 +74,14 @@
   $series = array();
   $series['name'] = "Measured Values";
   $series['type'] = 'scatter';
-  $series['tooltip']['formatter'] = 'function(){return this.measDate+\'<br />\'+this.x+\'<br />\'+this.y';
-  $series['tooltip']['headerFormat'] ='Taken: {point.measDate}<br />';
+  $series['tooltip']['pointFormat'] = '{point.measDate}<br>Stage: {point.stage}<br>Discharge: {point.Q}<br>Operator:{point.oper}<br>Quality:{point.rated}';
+  $series['tooltip']['headerFormat'] ='Measured Discharge<br>';
   while($row = $result->fetch_array()){
     $data = array();
+    $data['Q'] = (float)$row['qr_meas'];
+    $data['stage'] = (float)$row['hg_meas'];
+    $data['oper'] = $row['oper'];
+    $data['rated'] = $row['rated'];
     if($stage == 'y'){
         $data['y'] = (float)$row['hg_meas'];
         $data['x'] = (float)$row['qr_meas'];
@@ -89,8 +93,9 @@
 
     $values[] = $data;
   }
-  
+   
   $series['data'] = $values;
+  json_encode($series);
   $hcSeries[] = $series;        
                
 
@@ -164,6 +169,12 @@ $ratingDetails->change_type('comment','textarea');
 	}	
 
     $(function () {
+      Highcharts.setOptions({
+           lang: {
+             thousandsSep: ','
+           }
+      });
+
         $('#container').highcharts({
             chart: {
                 zoomType: 'xy'
@@ -185,6 +196,9 @@ $ratingDetails->change_type('comment','textarea');
 
             title: {
                 text:'Rating Viewer'
+            },
+            lang:{
+		thousandsSep: ','
             },
             legend: {
                 align: 'right',
@@ -230,14 +244,14 @@ $ratingDetails->change_type('comment','textarea');
         });
         var chart = $('#container').highcharts(),
 	    $button = $('#toggleAll');
-        $button.click(function () {
-            if(chart.series[2].visible) {
+            $button.click(function () {
+              if(chart.series[2].visible) {
                 for(var i =0; i<chart.series.length; i++){
                     chart.series[i].hide();
                 }
                 $button.html('Show All Curves');
-            }
-            else{
+              }
+              else{
                 for(var i = 0; i < chart.series.length; i++){
                     chart.series[i].show();
                 }
