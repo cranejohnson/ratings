@@ -58,6 +58,8 @@ class RiverSite{
             $this->usgs = $siteID;
             $this->lid = $row['lid'];
             $this->toCHPS = $row['toCHPS'];
+            #Temporarily force all ratings to go to CHPS.....
+            $this->toCHPS = 1;
             return true;
         }
 
