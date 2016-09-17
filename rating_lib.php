@@ -30,16 +30,16 @@ class RiverSite{
 
     }
 
-	/**
-	 * getConfigInfo
-	 *
-	 * This method gets basic configuration information about a site from the mysql db
-	 * and assigns it as object properties
-	 *
-	 * @access private
-	 * @param string site Site id - can be either NWSLID of USGS ID
-	 * @return boolean Returns true if the site was found in the db table
-	 */
+    /**
+     * getConfigInfo
+     *
+     * This method gets basic configuration information about a site from the mysql db
+     * and assigns it as object properties
+     *
+     * @access private
+     * @param string site Site id - can be either NWSLID of USGS ID
+     * @return boolean Returns true if the site was found in the db table
+     */
 
     private function getConfigInfo($siteID){
         if($this->_db == null) return false;
@@ -81,31 +81,31 @@ class RiverSite{
     }
 
 
-	/**
-	 * getDBRatings
-	 *
-	 * This method gets all of the ratings for a site from the database and populates them
-	 * into the site object.  Ratings are returned in descending order by date shifted.
+    /**
+     * getDBRatings
+     *
+     * This method gets all of the ratings for a site from the database and populates them
+     * into the site object.  Ratings are returned in descending order by date shifted.
      * The newest rating is always the first.
-	 *
-	 * @access public
-	 * @return int Returns the number of ratings loaded into the object
-	 */
+     *
+     * @access public
+     * @return int Returns the number of ratings loaded into the object
+     */
 
     public function getDBRatings(){
         $ratings = array();
         $this->ratings = array();
 
-		if(strlen($this->lid)==5){
-			$query = "Select * from ratings where lid = '{$this->lid}' order by rating_shifted desc";
-		}
+        if(strlen($this->lid)==5){
+            $query = "Select * from ratings where lid = '{$this->lid}' order by rating_shifted desc";
+        }
 
         elseif($this->usgs > 0){
-			$query = "Select * from ratings where usgs = '{$this->usgs}' order by rating_shifted desc";
-		}
+            $query = "Select * from ratings where usgs = '{$this->usgs}' order by rating_shifted desc";
+        }
         else{
-			$this->logger->log("No rating lid specified in getDBRatings subroutine.",PEAR_LOG_ERR);
-		}
+            $this->logger->log("No rating lid specified in getDBRatings subroutine.",PEAR_LOG_ERR);
+        }
 
         //Get a list of ratings from the database
 
@@ -122,14 +122,14 @@ class RiverSite{
         return $i;
   }
 
-	/**
-	 * getWebRating
-	 *
-	 * This method gets an RDB rating table for NWIS and loads into in the site object
-	 *
-	 * @access public
-	 * @return boolean Returns true if the NWIS rating was loaded into the object
-	 */
+    /**
+     * getWebRating
+     *
+     * This method gets an RDB rating table for NWIS and loads into in the site object
+     *
+     * @access public
+     * @return boolean Returns true if the NWIS rating was loaded into the object
+     */
 
     public function getWebRating(){
 
@@ -148,21 +148,21 @@ class RiverSite{
             return false;
         }
 
-		$this->logger->log("Downloaded RDB data for USGS site {$this->usgs}",PEAR_LOG_DEBUG);
+        $this->logger->log("Downloaded RDB data for USGS site {$this->usgs}",PEAR_LOG_DEBUG);
 
-		//Load the RDB rating into the object and return
+        //Load the RDB rating into the object and return
         return $this->loadRDB($textdata);;
     }
 
-	/**
-	 * loadDBRating
-	 *
-	 * This method loads a particular rating from the database into the site object.
-	 *
-	 * @access private
-	 * @param integer id Rating id to be loaded
-	 * @return boolean Returns true if the rating was loaded into the site object
-	 */
+    /**
+     * loadDBRating
+     *
+     * This method loads a particular rating from the database into the site object.
+     *
+     * @access private
+     * @param integer id Rating id to be loaded
+     * @return boolean Returns true if the rating was loaded into the site object
+     */
 
     private function loadDBRating($id){
         $rating = array();
@@ -191,19 +191,19 @@ class RiverSite{
             $rating['values'][]  = $row;
         }
         $this->ratings[] = $rating;
-		return true;
+        return true;
 
     }
 
     /**
-	 * loadPiXML
-	 *
-	 * This private method loads an PiXML rating into the site object.
-	 *
-	 * @access private
-	 * @param string piXML the piXML rating file string
-	 * @return boolean Returns true the rdb information was loaded into the site object
-	 */
+     * loadPiXML
+     *
+     * This private method loads an PiXML rating into the site object.
+     *
+     * @access private
+     * @param string piXML the piXML rating file string
+     * @return boolean Returns true the rdb information was loaded into the site object
+     */
 
     function import_piXML($xml){
         $rating = array();
@@ -223,7 +223,7 @@ class RiverSite{
             $date = $xmlrating->header->startDate['date']." ".$xmlrating->header->startDate['time'];
 
             $rating['rating_shifted'] = $date;
-			$rating['raw_format'] = 'piXML';
+            $rating['raw_format'] = 'piXML';
             $stageUnit = strtolower((string)$xmlrating->header->stageUnit);
             if($stageUnit != 'ft'){
                 $this->logger->log("Rating needs to be in feet.",PEAR_LOG_ERR);
@@ -253,7 +253,7 @@ class RiverSite{
             foreach($xmlrating->table->row as $value){
                 $array['stage'] = (string)$value['stage'];
                 $array['shift'] = 0;
-				if($value['logScaleStageOffset']) {
+                if($value['logScaleStageOffset']) {
                     $array['logScaleStageOffset'] = (string)$value['logScaleStageOffset'];
                 }
                 else{
@@ -272,15 +272,15 @@ class RiverSite{
 
 
 
-	/**
-	 * loadRDB
-	 *
-	 * This private method loads an RDB rating into the site object.
-	 *
-	 * @access private
-	 * @param string rdb the rdb rating file string
-	 * @return boolean Returns true the rdb information was loaded into the site object
-	 */
+    /**
+     * loadRDB
+     *
+     * This private method loads an RDB rating into the site object.
+     *
+     * @access private
+     * @param string rdb the rdb rating file string
+     * @return boolean Returns true the rdb information was loaded into the site object
+     */
 
     private function loadRDB($rdb){
 
@@ -290,9 +290,9 @@ class RiverSite{
         $rating['raw_file'] = $rdb;
 
         $rating['raw_format'] = 'USGSrdb';
-		$rating['comment'] = 'Imported from USGS automatically';
-		$rating['minStage'] = 0;
-		$rating['maxStage'] = 9999;
+        $rating['comment'] = 'Imported from USGS automatically';
+        $rating['minStage'] = 0;
+        $rating['maxStage'] = 9999;
         //Look through the RDB file and extract: USGS ID, Rating Number and Shift Date
         if(preg_match_all("/RATING ID=\"(.+?)\"/",$rdb,$matches)) $rating['USGSratid'] = "'".$matches[1][0]."'";
         if(preg_match_all("/STATION NAME=\"(.+?)\"/",$rdb,$matches)) $rating['USGSname'] = $matches[1][0];
@@ -344,15 +344,15 @@ class RiverSite{
         return true;
     }
 
-	/**
-	 * loadCSV
-	 *
-	 * This private method loads an RDB rating into the site object.
-	 *
-	 * @access private
-	 * @param string csv the csv rating file string
-	 * @return boolean Returns true the rdb information was loaded into the site object
-	 */
+    /**
+     * loadCSV
+     *
+     * This private method loads an RDB rating into the site object.
+     *
+     * @access private
+     * @param string csv the csv rating file string
+     * @return boolean Returns true the rdb information was loaded into the site object
+     */
 
     function loadCSV($csv){
 
@@ -361,8 +361,8 @@ class RiverSite{
         $rating['raw_file'] = $csv;
         $rating['values'] = array();
         $rating['raw_format'] = 'CSVupload';
-		$rating['minStage'] = 0;
-		$rating['maxStage'] = 9999;
+        $rating['minStage'] = 0;
+        $rating['maxStage'] = 9999;
         $rating['interpolate'] = 'log';
         $rating['comment'] = '';
         $rating['USGSratid'] = 'null';
@@ -422,15 +422,15 @@ class RiverSite{
     }
 
 
-	/**
-	 * loadlocalRDB
-	 *
-	 * This method reads a local rdb file and loads it into the site object
-	 *
-	 * @access public
-	 * @param string location the file location that holds the rdb information
-	 * @return boolean Returns true if the local rdb file was loaded
-	 */
+    /**
+     * loadlocalRDB
+     *
+     * This method reads a local rdb file and loads it into the site object
+     *
+     * @access public
+     * @param string location the file location that holds the rdb information
+     * @return boolean Returns true if the local rdb file was loaded
+     */
 
     public function loadLocalRDB($location){
         $this->source = 'RDB Archive';
@@ -442,17 +442,17 @@ class RiverSite{
         return $this->loadRDB($textdata);
     }
 
-	/**
-	 * dbInsertRating
-	 *
-	 * This loads the first rating in the site object into the database
-	 * This function handles duplicate ratings based the usgs id
-	 * and the rating_shifted time.
-	 *
-	 * @access public
-	 * @param string location the file location that holds the rdb information
-	 * @return boolean Returns true if the rating object was loaded into the database
-	 */
+    /**
+     * dbInsertRating
+     *
+     * This loads the first rating in the site object into the database
+     * This function handles duplicate ratings based the usgs id
+     * and the rating_shifted time.
+     *
+     * @access public
+     * @param string location the file location that holds the rdb information
+     * @return boolean Returns true if the rating object was loaded into the database
+     */
 
     public function dbInsertRating(){
         $postingtime = date('Y-m-d H:i',time());
@@ -463,12 +463,12 @@ class RiverSite{
 
         $insertquery = "Insert into ratings (usgs,lid,postingtime,rating_shifted,source,USGSratid,interpolate,minStage,maxStage,raw_file,raw_format,comment) VALUES
             ('{$this->usgs}','{$this->lid}','$postingtime','{$this->ratings[0]['rating_shifted']}',
-			'{$this->source}',{$this->ratings[0]['USGSratid']},'{$this->ratings[0]['interpolate']}','{$this->ratings[0]['minStage']}','{$this->ratings[0]['maxStage']}','$rawFile','{$this->ratings[0]['raw_format']}','{$this->ratings[0]['comment']}')";
+            '{$this->source}',{$this->ratings[0]['USGSratid']},'{$this->ratings[0]['interpolate']}','{$this->ratings[0]['minStage']}','{$this->ratings[0]['maxStage']}','$rawFile','{$this->ratings[0]['raw_format']}','{$this->ratings[0]['comment']}')";
 
         #echo $insertquery."<br>";
         $this->_db->query($insertquery);
 
-        $ratid = $this->_db->insert_id;
+        $ratid = $this->_db->insert_id; 
 
         if($this->_db->errno == 1062){
             $this->logger->log("dbInsertRating duplicate rating for {$this->usgs} {$this->lid}",PEAR_LOG_DEBUG);
@@ -482,26 +482,26 @@ class RiverSite{
 
 
 
-		$columns = array();
+        $columns = array();
         // Insert rating table into the 'ratingtables' table
-		foreach(array_keys($this->ratings[0]['values'][0]) as $key){
-			$columns[] = "$key";
-		}
-
-        for($i=0;$i<count($this->ratings[0]['values']);$i++){
-			$vals = array();
-			foreach($columns as $col){
-				$vals[] .= $this->ratings[0]['values'][$i][$col];
-			}
-	        $values .= "($ratid,".implode($vals,',')."),";
+        foreach(array_keys($this->ratings[0]['values'][0]) as $key){
+            $columns[] = "$key";
         }
 
-		$values = rtrim($values,",");
+        for($i=0;$i<count($this->ratings[0]['values']);$i++){
+            $vals = array();
+            foreach($columns as $col){
+                $vals[] .= $this->ratings[0]['values'][$i][$col];
+            }
+            $values .= "($ratid,".implode($vals,',')."),";
+        }
+
+        $values = rtrim($values,",");
         $insertquery = "Insert into ratingtables (ratingID,".implode($columns,",").") values $values";
 
 
 
-		#echo $insertquery;
+        #echo $insertquery;
 
         $result = $this->_db->query($insertquery);
 
@@ -526,14 +526,14 @@ class RiverSite{
     }
 
 
-	/**
-	 * whfsFormat
-	 *
-	 * Converts the rating loaded in the site object to whfs input format
-	 *
-	 * @access public
-	 * @return string Returns the rating in whfs insert format
-	 */
+    /**
+     * whfsFormat
+     *
+     * Converts the rating loaded in the site object to whfs input format
+     *
+     * @access public
+     * @return string Returns the rating in whfs insert format
+     */
 
     public function whfsFormat(){
         /**
@@ -557,13 +557,13 @@ class RiverSite{
     }
 
     /**
-	 * piXMLformat
-	 *
-	 * Converts the rating loaded in the site object to piXML format
-	 *
-	 * @access public
-	 * @return string Returns the rating in whfs insert format
-	 */
+     * piXMLformat
+     *
+     * Converts the rating loaded in the site object to piXML format
+     *
+     * @access public
+     * @return string Returns the rating in whfs insert format
+     */
 
     public function chpsPiXMLFormat(){
         /**
@@ -653,14 +653,14 @@ class RiverSite{
     }
 
 
-	/**
-	 * hydroDspFormat
-	 *
-	 * Converts the rating loaded in the site object to hydroDspFormat input format
-	 *
-	 * @access public
-	 * @return string Returns the rating in whfs insert format
-	 */
+    /**
+     * hydroDspFormat
+     *
+     * Converts the rating loaded in the site object to hydroDspFormat input format
+     *
+     * @access public
+     * @return string Returns the rating in whfs insert format
+     */
 
     public function hydroDspFormat(){
         /**
@@ -683,24 +683,24 @@ class RiverSite{
 
 
 
-	/**
-	 * ratingsToChps
-	 *
-	 * Sends a rating curve formats to Chps via the Ldad
-	 *     -RBD formatOutput   'rating_rdb_USGS.15097000.141120'
+    /**
+     * ratingsToChps
+     *
+     * Sends a rating curve formats to Chps via the Ldad
+     *     -RBD formatOutput   'rating_rdb_USGS.15097000.141120'
      *     -TXT formatOutput   'rating_txt_USGS.15097000.141120'
-	 *
-	 * @access public
-	 * @return boolean Returns true if file transfer is successful
+     *
+     * @access public
+     * @return boolean Returns true if file transfer is successful
      *
      *  NEED TO RE-FACTOR THIS AND IMRPOVE
-	 */
-	public function ratingToChps($sa_oc){
+     */
+    public function ratingToChps($sa_oc){
         $success = true;
-		//If the site object does not have ratings loaded, then load ratings
-		if(!isset($this->ratings[0])){
-			$this->getDBRatings();
-		}
+        //If the site object does not have ratings loaded, then load ratings
+        if(!isset($this->ratings[0])){
+            $this->getDBRatings();
+        }
         if(!$this->toCHPS) {
             $this->logger->log("no piXML rating {$this->lid}, this site is not configured for CHPS",PEAR_LOG_INFO);
             return false;
@@ -709,7 +709,7 @@ class RiverSite{
         //this file gets moved over to chps for ingest directly
 
         $piXMLfilename = TO_LDAD."rating_pixml".$sa_oc."_".$this->lid.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted'])).".xml";
-		if(file_put_contents($piXMLfilename,$this->chpsPiXMLFormat())){
+        if(file_put_contents($piXMLfilename,$this->chpsPiXMLFormat())){
             chmod($piXMLfilename,0777);
             $this->logger->log("Saved piXML rating in the toLDAD directory {$this->lid}",PEAR_LOG_INFO);
         }else{
@@ -718,31 +718,31 @@ class RiverSite{
         }
 
         return $success;
-  	}
+    }
 
 
 
 
 
-	/**
-	 * ratingsToAwips
-	 *
-	 * Sends three rating curve formats to Awips via the Ldad
-	 *     -WHFS formatOutput  'rating_whfs_ucha2.sql'
-	 *     -RBD formatOutput   'rating_rdb_USGS.15097000.141120'
-	 *     -Hydro Display Format 'rating_hydrodisplay_ucha2'
-	 *
-	 * @access public
+    /**
+     * ratingsToAwips
+     *
+     * Sends three rating curve formats to Awips via the Ldad
+     *     -WHFS formatOutput  'rating_whfs_ucha2.sql'
+     *     -RBD formatOutput   'rating_rdb_USGS.15097000.141120'
+     *     -Hydro Display Format 'rating_hydrodisplay_ucha2'
+     *
+     * @access public
      * @param string 'oc' to transfer to OC 'sa' to transfer to fews SA
-	 * @return boolean Returns true if file transfer is successful
+     * @return boolean Returns true if file transfer is successful
      *
      *  NEED TO RE-FACTOR THIS AND IMRPOVE
-	 */
-	public function ratingToAwips(){
-		//If the site object does not have ratings loaded, then load ratings
-		if(!isset($this->ratings[0])){
-			$this->getDBRatings();
-		}
+     */
+    public function ratingToAwips(){
+        //If the site object does not have ratings loaded, then load ratings
+        if(!isset($this->ratings[0])){
+            $this->getDBRatings();
+        }
 
         $success = true;
 
@@ -781,14 +781,14 @@ class RiverSite{
             $this->logger->log("No RDB rating available for {$this->lid}",PEAR_LOG_INFO);
         }
         return $success;
-  	}
+    }
 
-	/**
-	 * checkStability  - checks stability of the rating curves
- 	 *
-	 * @access public
-	 * @return array Returns array that (totalvar,recentvar)
-	 */
+    /**
+     * checkStability  - checks stability of the rating curves
+     *
+     * @access public
+     * @return array Returns array that (totalvar,recentvar)
+     */
     public function checkStability(){
 
         //Look through rating curves and calculated the max stage to use for comparison
@@ -834,7 +834,7 @@ class RiverSite{
     }
 
 
-	public function __destruct() {
+    public function __destruct() {
 
    }
 
