@@ -17,7 +17,7 @@
   $default = $row['usgs'];
   $USGS = '';
   
-  if(!($id = $_GET['USGS'])) $id = $default;
+  if(!($id = $_GET['site'])) $id = $default;
   
   if(!($stage = $_GET['stage'])) $stage = 'x';
   $hcSeries = array(); 

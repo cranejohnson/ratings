@@ -67,7 +67,7 @@
       $i++;	              
   }  
   
-  $query = "SELECT * FROM qMeasured where lid = '$id' and hg_meas is not null order by date desc";
+  $query = "SELECT * FROM qMeasured where lid = '$id' and hg_meas is not null order by measureDate desc";
   $result = $mysqli->query($query) or die($mysqli->error);
   $i = 0; 
   $values = array();
@@ -89,7 +89,7 @@
         $data['x'] = (float)$row['hg_meas'];
         $data['y'] = (float)$row['qr_meas'];
     }
-    $data['measDate'] = $row['date'];
+    $data['measDate'] = $row['measureDate'];
 
     $values[] = $data;
   }
@@ -113,6 +113,10 @@ function delete_rating_data($primary, $xcrud){
     $xcrud->query('DELETE FROM ratingtables WHERE ratingID = '.$primary);
 }
  
+function handleNewline($value, $fieldname, $primary_key, $row, $xcrud){
+    echo "here!";
+    return "This is it";
+}    
  
 include('../xcrud_1_6_25/xcrud/xcrud.php');
 $ratingDetails = Xcrud::get_instance();
@@ -136,6 +140,8 @@ $ratingDetails->change_type('rating_shifted','text','',40);
 $ratingDetails->change_type('postingtime','text','',40);
 $ratingDetails->change_type('raw_file','textarea','',20);
 $ratingDetails->change_type('comment','textarea');
+#$ratingDetails->column_callback('raw_file','handleNewline');
+#$ratingDetails->column_pattern('raw_file',nl2br({value}));
 
 
 

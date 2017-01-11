@@ -201,7 +201,8 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'robert.oslund@noaa.gov' => 'Rob',
        'andrew.dixon@noaa.gov' => 'Andy',
        'edward.plumb@noaa.gov' => 'Ed',
-       'Aaron.Jacobs@noaa.gov' => 'Aaron');
+       'Aaron.Jacobs@noaa.gov' => 'Aaron',
+       'jessica.cherry@noaa.gov' => 'Jessie');
   
     //If an overRideEmail is provided use that
     if($overRideEmail){
