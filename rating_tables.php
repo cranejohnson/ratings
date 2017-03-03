@@ -17,7 +17,7 @@ if(isset($_POST['debug'])){
  */
 
 
-    #include('/hd1apps/data/intranet/html/tools/xcrud_1_6_25/xcrud/xcrud.php');
+    #include('/var/www/html/tools/xcrud_1_6_25/xcrud/xcrud.php');
     include('./resources/xcrud/xcrud.php');
 
 

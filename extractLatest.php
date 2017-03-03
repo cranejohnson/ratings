@@ -7,7 +7,7 @@
 
 
   #redrock  
-  require_once('/hd1apps/data/intranet/html/private/adminconnecti.php');
+  require_once('/var/www/html/private/adminconnecti.php');
   $mysqli->select_db("aprfc");
   
 

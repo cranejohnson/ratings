@@ -22,7 +22,7 @@ date_default_timezone_set('UTC');
 
 /* Include config file for paths etc.....   */
 require_once('/usr/local/apps/scripts/bcj/hydroTools/config.inc.php');
-require_once "/hd1apps/data/intranet/html/tools/PHPMailer/PHPMailerAutoload.php";
+require_once "/var/www/html/tools/PHPMailer/PHPMailerAutoload.php";
 
 /* Include Pear log package                 */
 require_once 'Log.php';
@@ -102,7 +102,7 @@ $startTime = date('Y-m-d H:i:s',time()-5);
 
 if(isset($_SERVER['REQUEST_METHOD'])){
 
-    include('/hd1apps/data/intranet/html/tools/xcrud_1_6_25/xcrud/xcrud.php');
+    include('/var/www/html/tools/xcrud_1_6_25/xcrud/xcrud.php');
 
     $log_results = Xcrud::get_instance();
 
@@ -485,7 +485,7 @@ function variance($aValues, $bSample = false){
 	#$graph->yaxis->SetTitlemargin(70);
 	$graph->SetFrame(true,'darkblue',0);
 
-    $fileName = "/hd1apps/data/intranet/html/cache/".$rCurves->lid.date('_dMy').".png";
+    $fileName = "/var/www/html/cache/".$rCurves->lid.date('_dMy').".png";
     $graph->Stroke($fileName);
     return($fileName);
 }
