@@ -197,8 +197,6 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'scott.lindsey@noaa.gov' => 'Scott',
        'edward.moran@noaa.gov' => 'Ted',
        'celine.vanbreukelen@noaa.gov' => 'Celine',
-       'kurt.mayer@noaa.gov' => 'Kurt',
-       'robert.oslund@noaa.gov' => 'Rob',
        'andrew.dixon@noaa.gov' => 'Andy',
        'edward.plumb@noaa.gov' => 'Ed',
        'Aaron.Jacobs@noaa.gov' => 'Aaron',
@@ -252,6 +250,7 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
     {
         $mail->AddAddress($email, $name);
     }
+    $mail->AddCC('jostman@usgs.gov','Johnse');
     $mail->Subject = "Rating curves updated: $list";
     $mail->Body = $message;
     foreach($Files as $file){
@@ -303,19 +302,19 @@ function loadArchive($logger,$mysqli,$archivedir){
 /**
  * get_updated_USGS_ratings
  *
- * This function gets a list of updated USGS ratings curves from the ratings depot
+ * This function gets a list of updated exsa USGS ratings curves from the ratings depot
  *
  * @access public
  * @param logger object Error logging object
  * @param period integer the number of hours back to look for changes
  *                      defaults to 168 hours (7 days)
  * @param sitefilter string grep pattern string to match against lines
- *                      default is '^(15|20)' filters for HI and AK
+ *                      default is '^(15|16)' filters for HI and AK
  * @return sites  array of usgs ratings that are in the usgs update file
  *
  */
 
-function get_updated_USGS_ratings($logger,$period = 168,$sitefilter = '^(15|20)'){
+function get_updated_USGS_ratings($logger,$period = 168,$sitefilter = '^(15|16)'){
     $sites = array();
     $url = RATINGS_DEPOT."?period=$period";
     #$url = "http://waterdata.usgs.gov/nwisweb/get_ratings?period=$period";
