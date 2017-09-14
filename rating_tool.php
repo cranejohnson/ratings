@@ -24,6 +24,8 @@ date_default_timezone_set('UTC');
 require_once('/usr/local/apps/scripts/bcj/hydroTools/config.inc.php');
 require_once "/var/www/html/tools/PHPMailer/PHPMailerAutoload.php";
 
+define("LOG_TYPE","DB");
+
 /* Include Pear log package                 */
 require_once 'Log.php';
 
