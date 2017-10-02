@@ -219,13 +219,9 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
         $list = $updatedSites[0];
     }
 
-    $log = "Date-Time                - Priority -           Message\r\n";
 
     $query = "select * from log_table where ident like '%rating_tool.php%' and logtime > '$startTime' and priority < 7 order by logtime asc";
     $result = $mysqli->query($query);
-    while($row = $result->fetch_assoc()){
-        $log .= "{$row['logtime']}  -     [{$row['priority']}]   - {$row['message']}\r\n";
-    }
 
 
 
@@ -240,7 +236,6 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
         $message .= "         Link to usgs rating curve http://waterdata.usgs.gov/nwisweb/data/ratings/exsa/USGS.".$riversite->usgs.".exsa.rdb\r\n\r\n";
 
     }
-    $message .= "\r\nLOG:\r\n".$log;
 
 
     $mail = new PHPMailer;
@@ -486,7 +481,7 @@ function variance($aValues, $bSample = false){
 	#$graph->yaxis->SetTitlemargin(70);
 	$graph->SetFrame(true,'darkblue',0);
 
-    $fileName = "/var/www/html/cache/".$rCurves->lid.date('_dMy').".png";
+    $fileName = "/var/www/html/cache/".$rCurves->usgs."_".$rCurves->lid.date('_dMy').".png";
     $graph->Stroke($fileName);
     return($fileName);
 }
@@ -629,29 +624,24 @@ foreach($sites as $site){
     else{
 
         $riversite = new riverSite($logger,$mysqli,$site);
-
         $logger->log("Updating {$riversite->lid}",PEAR_LOG_INFO);
-
-		//Check the USGS site and see if a new curve is available
-		if($checkForNew){
-			echo "Checking for USGS rating.<br>";
-			if($riversite->getWebRating()){
-
-				if($ratid = $riversite->dbInsertRating()){
-
-					$ratingsUpdated[] = $site->usgs;
-				}
+	//Check the USGS site and see if a new curve is available
+	if($checkForNew){
+		echo "Checking for USGS rating.<br>";
+		if($riversite->getWebRating()){
+			if($ratid = $riversite->dbInsertRating()){
+				$ratingsUpdated[] = $site->usgs;
 			}
-			else{
-				$logger->log("Failed to get USGS web rating for $site",PEAR_LOG_WARNING);
-			}
+		}
+		else{
+			$logger->log("Failed to get USGS web rating for $site",PEAR_LOG_WARNING);
+		}
         }
         $sentto = array();
 
-		//Get ratings from local database and send them to where then need to go
+	//Get ratings from local database and send them to where then need to go
         if($riversite->getDBRatings()>0){
-
-			//Graph the curves with jpgraph and add the file path/name to the array
+	    //Graph the curves with jpgraph and add the file path/name to the array
             $graphFiles[]=plotCurves($riversite,array(0,1));
 
             if(in_array('chpsOC',$sendTo)){
