@@ -123,7 +123,7 @@ if(isset($_SERVER['REQUEST_METHOD'])){
     $log_results->column_class('id,logtime,priority', 'align-center');
     $log_results->relation('priority','log_levels','id','name');
 
-    if($debug == 'false')$log_results->start_minimized(true);
+    #if($debug == 'false')$log_results->start_minimized(true);
 
     $config_table = Xcrud::get_instance();
     $config_table->default_tab('Site Config');
@@ -200,7 +200,7 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'edward.moran@noaa.gov' => 'Ted',
        'celine.vanbreukelen@noaa.gov' => 'Celine',
        'andrew.dixon@noaa.gov' => 'Andy',
-       'edward.plumb@noaa.gov' => 'Ed',
+       'karen.endres@noaa.gov' => 'Karen',
        'Aaron.Jacobs@noaa.gov' => 'Aaron',
        'jessica.cherry@noaa.gov' => 'Jessie');
   
@@ -522,7 +522,7 @@ if($action == 'checkUSGS') $checkForNew = true;
 if(php_sapi_name() == 'cli') {
     $action = 'checkForAllNew';
 	$sendTo = array('chpsOC','awips');
-        $sendemail = 'true';
+    $sendemail = 'true';
 	$checkForAllNew = 'true';
 	$logger->log("Running from command line",PEAR_LOG_INFO);
 }
@@ -643,11 +643,15 @@ foreach($sites as $site){
         if($riversite->getDBRatings()>0){
 	    //Graph the curves with jpgraph and add the file path/name to the array
             $graphFiles[]=plotCurves($riversite,array(0,1));
+            
+			//Send all ratings to CHPS
+			if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
 
-            if(in_array('chpsOC',$sendTo)){
-                //Send the rating to chps
-                if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
-            }
+            //if(in_array('chpsOC',$sendTo)){
+            //    //Send the rating to chps
+            //    if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
+            //}
+			
             if(in_array('awips',$sendTo)){
                 //Send the rating to AWIPS
                 if($riversite->ratingToAwips()) $sentto[] = 'AWIPS';

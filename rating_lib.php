@@ -569,7 +569,7 @@ class RiverSite{
         /**
          * See http://fews.wldelft.nl/shcemas/version1.0/pi-schemas/pi_ratings.xsd for piXML format information
          */
-        $daysBack = 15;
+        $daysBack = 0;
         $minStage = $this->ratings[0]['values'][0]['stage'];
         $maxStage = 'INF';
         $stageUnit = 'FT';
@@ -602,6 +602,9 @@ class RiverSite{
         $header->appendChild($loc);
         $start = $piXML->createElement('startDate');
         $startAtt = $piXML->createAttribute('date');
+		if( strtotime($this->ratings[0]['rating_shifted']) > strtotime('-14 day') ){
+	        $daysBack = -15;      
+		} 
         $startAtt->value = date('Y-m-d',strtotime($this->ratings[0]['rating_shifted']." -$daysBack days"));
         $start->appendChild($startAtt);
         $startAtt = $piXML->createAttribute('time');
