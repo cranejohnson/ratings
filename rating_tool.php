@@ -539,7 +539,7 @@ if($action == 'checkForAllNew'){
 
 if($action == 'allCurves'){
     //Determine which sites need to have ratings sent to chps
-    $query = "Select lid from ratings_config where toCHPS = 1 order by lid asc";
+    $query = 'SELECT DISTINCT lid FROM `ratings` WHERE lid <> "NULL" order by lid';
     $result = $mysqli->query($query);
     $sendTo = array('fewsSA');
     if(!$result){
@@ -644,13 +644,10 @@ foreach($sites as $site){
 	    //Graph the curves with jpgraph and add the file path/name to the array
             $graphFiles[]=plotCurves($riversite,array(0,1));
             
-			//Send all ratings to CHPS
-			if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
-
-            //if(in_array('chpsOC',$sendTo)){
-            //    //Send the rating to chps
-            //    if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
-            //}
+            if(in_array('chpsOC',$sendTo)){
+                //Send the rating to chps
+                if($riversite->ratingToChps('oc')) $sentto[] = 'CHPS OC';
+            }
 			
             if(in_array('awips',$sendTo)){
                 //Send the rating to AWIPS
@@ -678,8 +675,7 @@ if($sendemail == 'true') sendEmail($logger,$mysqli,$sitesUpdated,$graphFiles);
 $coeSites = array('CRHA2','UCHA2','MCDA2','CHLA2','CHFA2','TAFA2');
 $coeUpdated = array_intersect($coeSites,$sitesUpdated);
 $coeFiles = array();
-$coeRecipients = array(
-       'cepoaencwhh@usace.army.mil' =>'HH');
+//$coeRecipients = array('cepoaencwhh@usace.army.mil' =>'HH');
 
 foreach($graphFiles as $file){
         foreach($coeSites as $s){
@@ -687,7 +683,7 @@ foreach($graphFiles as $file){
         }
 }
 
-if(count($coeUpdated) > 0) sendEmail($logger,$mysqli,$coeUpdated,$coeFiles,$coeRecipients);
+#if(count($coeUpdated) > 0) sendEmail($logger,$mysqli,$coeUpdated,$coeFiles,$coeRecipients);
 
 
 
@@ -740,7 +736,7 @@ if(php_sapi_name() === 'cli') exit;
 	<h3>1. Select a process to update rating curves(s):</h3>
     <form id="riverform"  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
         <input type="radio" name="action" value="importFile" id="fileRadio" >Import pi-XML, RDB or csv rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
-		<!--<input type="radio" name="action" value="allCurves">Send the most recent rating curve for each site in the database<br>-->
+		<input type="radio" name="action" value="allCurves">Send the most recent rating curve for each site in the database to Fews SA<br>
     	<input type="radio" name="action" value="checkForAllNew">Check for new USGS Ratings for ALL SITES<br>
 		<input type="radio" name="action" value="checkUSGS">Check USGS rating Depot for a Specific Site(s):<br>
         <input type="radio" name="action" value="sendFromDB">Send existing rating curves from database for Site(s): <br><br>
