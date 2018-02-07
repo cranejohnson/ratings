@@ -704,7 +704,8 @@ class RiverSite{
         if(!isset($this->ratings[0])){
             $this->getDBRatings();
         }
-        if(!$this->toCHPS) {
+#        if(!$this->toCHPS) {
+        if(0){
             $this->logger->log("no piXML rating {$this->lid}, this site is not configured for CHPS",PEAR_LOG_INFO);
             return false;
         }

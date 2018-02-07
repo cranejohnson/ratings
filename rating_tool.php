@@ -642,7 +642,9 @@ foreach($sites as $site){
 	//Get ratings from local database and send them to where then need to go
         if($riversite->getDBRatings()>0){
 	    //Graph the curves with jpgraph and add the file path/name to the array
-            $graphFiles[]=plotCurves($riversite,array(0,1));
+            if($sendemail == 'true'){
+                $graphFiles[]=plotCurves($riversite,array(0,1));
+            }
             
             if(in_array('chpsOC',$sendTo)){
                 //Send the rating to chps
