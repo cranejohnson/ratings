@@ -199,7 +199,6 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'scott.lindsey@noaa.gov' => 'Scott',
        'edward.moran@noaa.gov' => 'Ted',
        'celine.vanbreukelen@noaa.gov' => 'Celine',
-       'andrew.dixon@noaa.gov' => 'Andy',
        'karen.endres@noaa.gov' => 'Karen',
        'Aaron.Jacobs@noaa.gov' => 'Aaron',
        'jessica.cherry@noaa.gov' => 'Jessie');
