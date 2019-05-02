@@ -605,7 +605,7 @@ class RiverSite{
 		if( strtotime($this->ratings[0]['rating_shifted']) > strtotime('-14 day') ){
 	        $daysBack = -15;      
 		} 
-        $startAtt->value = date('Y-m-d',strtotime($this->ratings[0]['rating_shifted']." -$daysBack days"));
+        $startAtt->value = date('Y-m-d',strtotime($this->ratings[0]['rating_shifted']." +$daysBack days"));
         $start->appendChild($startAtt);
         $startAtt = $piXML->createAttribute('time');
         $startAtt->value = date('H:i:s',strtotime($this->ratings[0]['rating_shifted']));
@@ -713,6 +713,7 @@ class RiverSite{
         //this file gets moved over to chps for ingest directly
 
         $piXMLfilename = TO_LDAD."rating_pixml".$sa_oc."_".$this->lid.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted'])).".xml";
+        file_put_contents("last_export/rating_pixml".$sa_oc."_".$this->lid.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted'])).".xml",$this->chpsPiXMLFormat());
         if(file_put_contents($piXMLfilename,$this->chpsPiXMLFormat())){
             chmod($piXMLfilename,0777);
             $this->logger->log("Saved piXML rating in the toLDAD directory {$this->lid}",PEAR_LOG_INFO);
@@ -753,6 +754,8 @@ class RiverSite{
         //If there is a NWS lid established stage send the hydrodisplay and whfs formated rating curves to the ldad
         if($this->lid){
             $HDfilename = TO_LDAD."rating_hydrodisplay_".strtolower($this->lid);
+            file_put_contents("last_export/rating_hydrodisplay_".strtolower($this->lid),$this->hydroDspFormat());
+            
             if(file_put_contents($HDfilename,$this->hydroDspFormat())){
                 chmod($HDfilename,0777);
                 $this->logger->log("Saved hydrodisplay rating in the toLDAD directory {$this->usgs}",PEAR_LOG_INFO);
@@ -761,6 +764,7 @@ class RiverSite{
                 $success = false;
             }
             $whfsfilename = TO_LDAD."rating_whfs_".$this->lid.".sql";
+            file_put_contents("last_export/rating_whfs_".$this->lid.".sql",$this->whfsFormat());
             if(file_put_contents($whfsfilename,$this->whfsFormat())){
                 chmod($whfsfilename,0777);
                 $this->logger->log("Saved whfsFormat rating in the toLDAD directory {$this->usgs}",PEAR_LOG_INFO);
@@ -773,6 +777,8 @@ class RiverSite{
         //Send the RDB file to the LDAD
         if(strlen($this->ratings[0]['raw_file'])>0 && ($this->ratings[0]['raw_format'] == 'USGSrdb')) {
             $rdbfilename = TO_LDAD."rating_rdb_USGS".$this->usgs.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted']));
+            file_put_contents("last_export/rating_rdb_USGS".$this->usgs.".".date('Ymd',strtotime($this->ratings[0]['rating_shifted'])),$this->ratings[0]['raw_file']);
+            
             if(file_put_contents($rdbfilename,$this->ratings[0]['raw_file'])){
                 chmod($rdbfilename,0777);
                 $this->logger->log("Saved rdb rating in the toLDAD directory {$this->usgs}",PEAR_LOG_INFO);
@@ -784,6 +790,8 @@ class RiverSite{
         else{
             $this->logger->log("No RDB rating available for {$this->lid}",PEAR_LOG_INFO);
         }
+        $this->logger->log("Copy of exported files: http://140.90.218.62/tools/ratings/last_export/</ahref>",PEAR_LOG_INFO);
+        
         return $success;
     }
 
