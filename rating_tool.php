@@ -201,8 +201,9 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
        'celine.vanbreukelen@noaa.gov' => 'Celine',
        'karen.endres@noaa.gov' => 'Karen',
        'Aaron.Jacobs@noaa.gov' => 'Aaron',
-       'jessica.cherry@noaa.gov' => 'Jessie');
-  
+       'jessica.cherry@noaa.gov' => 'Jessie',
+       'johnse.ostman@noaa.gov' => 'Johnse');
+ 
     //If an overRideEmail is provided use that
     if($overRideEmail){
         $recipients = $overRideEmail;
@@ -246,7 +247,6 @@ function sendEmail($logger,$mysqli,$updatedSites,$Files,$overRideEmail = false){
     {
         $mail->AddAddress($email, $name);
     }
-    $mail->AddCC('jostman@usgs.gov','Johnse');
     $mail->Subject = "Rating curves updated: $list";
     $mail->Body = $message;
     foreach($Files as $file){
