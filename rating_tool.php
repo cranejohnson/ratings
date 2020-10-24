@@ -741,7 +741,9 @@ if(php_sapi_name() === 'cli') exit;
     </form>
 	<h3>1. Select a process to update rating curves(s):</h3>
     <form id="riverform"  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-        <input type="radio" name="action" value="importFile" id="fileRadio" >Import pi-XML, RDB or csv rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" /><br>
+        <input type="radio" name="action" value="importFile" id="fileRadio" >Import pi-XML, RDB or csv rating curves (max 20 files): <input name="upload[]" type="file" id="fileSelect" multiple="multiple" onchange="document.getElementById('fileRadio').checked = true;" />
+           csv file <a href="csvUploadSample.csv">sample</a></br>
+            
 		<input type="radio" name="action" value="allCurves">Send the most recent rating curve for each site in the database to Fews SA<br>
     	<input type="radio" name="action" value="checkForAllNew">Check for new USGS Ratings for ALL SITES<br>
 		<input type="radio" name="action" value="checkUSGS">Check USGS rating Depot for a Specific Site(s):<br>
@@ -751,7 +753,8 @@ if(php_sapi_name() === 'cli') exit;
         <h3>2. Send most recent curves to:</h3>
 		<input type="checkbox" name="sendTo[]" value="chpsOC" checked>CHPS OC
         <input type="checkbox" name="sendTo[]" value="fewsSA">CHPS Fews SA
-		<input type="checkbox" name="sendTo[]" value="awips" checked>AWIPS (HydroDisplay and WHFS)<br>
+		<input type="checkbox" name="sendTo[]" value="awips" checked>AWIPS (HydroDisplay and WHFS)<br><br>
+        <a href="last_export/"> Review the most recently exported ratings (xml,csv,sql)</a>
 		<h3>3. Diagnostics</h3>
 		</br>
 		<input type="checkbox" name="debug" value="true">Show Debug Log<br>
